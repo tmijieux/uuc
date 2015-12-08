@@ -5,16 +5,17 @@
 #include "statement.h"
 
 struct function {
-    struct symbol *name_s;
-    const struct type *type;
+	struct symbol *name_s;
+	const struct type *type;
+	struct statement *body;
     
-    const char *code;
-    const char *vcode;
+	const char *code;
+	const char *vcode;
     
-    struct hash_table *alloc_init;
-    struct list *allocas;
+	struct hash_table *alloc_init;
+	struct list *allocas;
     
-    int code_set;
+	int body_set;
 };
 
 extern struct function *current_fun;

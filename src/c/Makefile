@@ -16,6 +16,7 @@ SRC=	grammar.c \
 	main.c \
 	module.c \
 	expr_codegen.c \
+	stmt_codegen.c \
 	symb_codegen.c \
 	type_codegen.c \
 	libutil.a \
@@ -51,3 +52,6 @@ clean:
 
 fullclean: clean
 	$(RM) uuc -f
+
+edit: 
+	emacs -mm *.c *.h *.y *.l &

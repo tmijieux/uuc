@@ -8,15 +8,24 @@
 #include "error.h"
 #include "expression.h"
 
+#define DEFINE_TYPE(ty)			\
+    const struct type* type_##ty;	\
+    const struct type* type_##ty##_v;	\
+    
+#define INIT_TYPE(ty, TY)				\
+    type_##ty = type_new(TYPE_##TY);			\
+    type_##ty##_v = type_new(TYPE_##TY);		\
+    ((struct type*)type_##ty##_v)->is_vector = true;	\
+
 static struct type *type_new(enum enum_type t);
 
-const struct type* type_undef;
-const struct type* type_generic;
-const struct type* type_int;
-const struct type* type_long;
-const struct type* type_float;
-const struct type* type_void;
-const struct type* type_bool;
+DEFINE_TYPE(undef);
+DEFINE_TYPE(generic);
+DEFINE_TYPE(int);
+DEFINE_TYPE(long);
+DEFINE_TYPE(float);
+DEFINE_TYPE(void);
+DEFINE_TYPE(bool);
 
 static int type_precision__ [] = {
 	[ TYPE_UNDEF ] = -1,
@@ -56,21 +65,19 @@ const struct type* last_function_return_type;
 
 /***************************************************/
 
-
 __attribute__((constructor))
 static void type_init(void)
 {
-	type_undef = type_new(TYPE_UNDEF);
-	type_generic = type_new(TYPE_GENERIC);
-	type_int = type_new(TYPE_INT);
-	type_float = type_new(TYPE_FLOAT);
-	type_void = type_new(TYPE_VOID);
-	type_long = type_new(TYPE_LONG);
-	type_bool = type_new(TYPE_BOOL);
+    INIT_TYPE(undef, UNDEF);
+    INIT_TYPE(generic, GENERIC);
+    INIT_TYPE(int, INT);
+    INIT_TYPE(long, LONG);
+    INIT_TYPE(float, FLOAT);
+    INIT_TYPE(void, VOID);
+    INIT_TYPE(bool, BOOL);
 }
 
 /***************************************************/
-
 
 int type_precision(const struct type *type)
 {
@@ -88,6 +95,7 @@ static struct type *type_new(enum enum_type et)
 	struct type *t = calloc(sizeof*t, 1);
 	t->type = et;
 	t->size = type_size(t);
+	t->is_vector = false; // the default
 	return t;
 }
 

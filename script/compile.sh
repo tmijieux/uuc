@@ -33,7 +33,8 @@ if [ $# -ge 1 ]; then
 	     # compile avec notre compilateur
 	    cpp -P $i > $a.1 || clean_die
 	    ${UUC} $a.1 > $a.2 || clean_die
-	    (${OPT} -std-compile-opts -mem2reg $a.2 | ${LLC} > $a.S) || clean_die
+	    ${OPT} -std-compile-opts -mem2reg $a.2 > $a.3 || clean_die
+	    ${LLC} > $a.S < $a.3 || clean_die
 	elif [[ "$extension" == "c" ]]; then
 	    echo "compiling C extension $i"
 	    ${CC} ${CFLAGS} $i -S -o $a.S || clean_die # des extensions en c

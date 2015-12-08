@@ -80,6 +80,7 @@ void module_print(struct module *m, FILE *out)
 	for (int i = 1; i <= si; ++i)
 	{
 		struct function *fun = list_get(m->funlist, i);
+		fun_cg(fun);
 		fputs(fun->code, out);
 	}
 }

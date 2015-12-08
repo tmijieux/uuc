@@ -25,8 +25,8 @@ int main(int argc, char *argv[])
 		if (input) {
 			yyin = input;
 		} else {
-			fprintf (stderr, "%s: Could not open %s\n",
-				 *argv, argv[1]);
+			fprintf(stderr, "%s: Could not open %s\n",
+				*argv, argv[1]);
 			return EXIT_FAILURE;
 		}
 	} else {

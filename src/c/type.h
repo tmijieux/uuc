@@ -57,6 +57,7 @@ struct type {
 	struct type_function function_type;
     };
     size_t size;
+    bool is_vector;
 };
 
 int type_precision(const struct type *type);
@@ -82,6 +83,7 @@ bool type_is_basic(const struct type *type);
 bool type_is_integer(const struct type *type);
 bool type_is_function(const struct type *ty);
 bool type_is_array(const struct type *ty);
+bool type_is_vector(const struct type *ty);
 const char *type_printable(const struct type *t);
 
 

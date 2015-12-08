@@ -10,6 +10,7 @@ void warning(const char *format, ...);
 void error(const char *format, ...);
 void fatal_error(const char *format, ...);
 void fatal_error2(const char *format, ...);
+void internal_error(const char *format, ...);
 int error_count(void);
 int yyerror(const char *s);
 

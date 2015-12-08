@@ -1,7 +1,6 @@
 #!/bin/bash
 COMPILE=../../compile
 
-
 #
 # The purpose of this script is to verify if the compiler reports an error
 # only when it is supposed to do so

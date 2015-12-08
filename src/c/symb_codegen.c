@@ -45,8 +45,8 @@ void symb_cg(struct symbol *sy)
 			const struct statement *array_init =
 				st_array_alloc_rec( array, 0 );
 
+			stmt_cg(array_init);
 			sy->variable.init_code = array_init->code;
-//			printf("WOOROOT %s\n\n lililol\n", array_init->code);
 		}
 	}
 }
@@ -73,7 +73,7 @@ static const struct statement *
 st_array_alloc_rec(const struct expression *array__, int depth)
 {
 	// We need to renew the array expression here:
-	const struct expression *array = expr_array_copy(array__);
+	const struct expression *array = array__;//expr_array_copy(array__);
 	
 	struct symbol *fun_sy, *loop_counter_sy, *fun_arg_sy;
 	    
@@ -108,7 +108,7 @@ st_array_alloc_rec(const struct expression *array__, int depth)
 	arr_memsize = expr_addition(
 		expr_constant(type_long, 8),
 		mul
-	);
+		);
 	
 	list_append(l, arr_memsize);
 	funcall_param = expr_funcall(fun_sy, l);
@@ -122,7 +122,7 @@ st_array_alloc_rec(const struct expression *array__, int depth)
 		expr_assignment(
 			expr_array_size( array ),
 			type_array_size(array->type)
-		);
+			);
 	const struct statement *transfer_size_stmt =
 		stmt_expression(transfer_size);
 	
