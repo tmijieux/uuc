@@ -1,0 +1,9 @@
+
+
+int bar(int x, int y);
+
+int main()
+{
+	bar(3, 4);
+	return 0;
+}

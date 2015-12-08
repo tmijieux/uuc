@@ -1,0 +1,15 @@
+
+
+void putint(int i);
+
+void main()
+{
+	int a;
+
+	a = 0;
+	
+	if ( a )
+	{
+		putint(1);
+	}
+}

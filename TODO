@@ -1,0 +1,35 @@
+
+map : more map call type for vectorized or non vectorize type 
+
+generate map functions in c to llvm with clang and modifiy the function names
+to add dots in it
+
+typecheck dereferencing non initialized arrays 
+type check: differentiate use of array whose size was given
+from those which don't
+
+maybe think of a way to make the IR codegen generic so it can be replaced
+by another IR (C)
+
+think about some tests
+
+rework the examples so that they present only one feature of the 
+langage/compiler at a time
+
+llvm:
+	what is sdiv instruction?
+	what is the s prefix?
+
+
+Module for easily manage output colors
+(color stack, use the great asprint with gc a lot!)
+
+Better factorisation for type_check error and 
+either get rid or finalize that 'source code' thing
+
+allow non constant integer in array declarations to provide a kind of malloc
+
+ADD suffix for differentiate variable with same name 
+not in the same level
+
+

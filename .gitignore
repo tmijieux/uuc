@@ -1,0 +1,12 @@
+uuc
+*~
+*.pdf
+*.aux
+*.log
+a.out
+*.a
+*.so
+*.o
+grammar.c
+grammar.tab.h
+scanner.c
