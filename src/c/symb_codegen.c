@@ -70,24 +70,19 @@ static const struct expression *expr_array_copy(const struct expression *expr)
 // mais genere des boucles imbriqués (iteratives) dans le programme généré
 // pour allouer les tableaux à dimensions multiples
 static const struct statement *
-st_array_alloc_rec(const struct expression *array__, int depth)
+st_array_alloc_rec(const struct expression *array, int depth)
 {
-	// We need to renew the array expression here:
-	const struct expression *array = array__;//expr_array_copy(array__);
-	
 	struct symbol *fun_sy, *loop_counter_sy, *fun_arg_sy;
-	    
 	const struct expression *assign_expr, *postfix;
 	const struct expression *funcall_param, *arr_memsize, *constant;
-    	
-	struct statement *for_stmt, *assign_stmt;
 	const struct expression *init, *comp, *pre_inc, *loop_counter_expr;
 	const struct expression *bitcast;
-    
-	const struct type *type = array->type, *malloc_type;
-	struct list * l;
-	struct list *instr = list_new(0);
+	struct statement *for_stmt, *assign_stmt;
+	const struct type *type, *malloc_type;
+	struct list * l, *instr;
 
+	instr = list_new(0);
+	type = array->type;
 		
 	// =  GC_malloc( SIZE_OF_ARRAY );
 	
