@@ -98,55 +98,33 @@ void expr_cg_xcrement(struct expression *e)
     }
 }
 
+
+#define expr_cg_xoperation_case(TYPE_, OPNAME_, SUFFIX_)		        \
+    case EXPR_##TYPE_:						        	\
+        expr_cg_operation(e, OPNAME_, (e->type == type_float)?"f":SUFFIX_);	\
+        break
+
 void expr_cg_xoperation(struct expression *e)
 {
     switch ( e->expression_type ) {
- 
-    case EXPR_MULTIPLICATION:
-	expr_cg_operation(e, "mul", (e->type == type_float)?"f":"");
-	break;
-	
-    case EXPR_DIVISION:
-	expr_cg_operation(e, "div", (e->type == type_float)?"f":"s");
-	break;
-	
-    case EXPR_ADDITION:
-	expr_cg_operation(e, "add", (e->type == type_float)?"f":"");
-	break;
-	
-    case EXPR_SUBSTRACTION:
-	expr_cg_operation(e, "sub", (e->type == type_float)?"f":"");
-	break;
-	
-    case EXPR_LOWER:
-	expr_cg_operation(e, "cmp slt", (e->type == type_float)?"f":"i");
-	break;
-	
-    case EXPR_GREATER:
-	expr_cg_operation(e, "cmp sgt", (e->type == type_float)?"f":"i");
-	break;
-	
-    case EXPR_LEQ:
-	expr_cg_operation(e, "cmp sle", (e->type == type_float)?"f":"i");
-	break;
-	
-    case EXPR_GEQ:
-	expr_cg_operation(e, "cmp sge", (e->type == type_float)?"f":"i");
-	break;
-	
-    case EXPR_NEQ:
-	expr_cg_operation(e, "cmp ne", (e->type == type_float)?"f":"i");
-	break;
-	
-    case EXPR_EQ:
-	expr_cg_operation(e, "cmp eq", (e->type == type_float)?"f":"i");
-	break;
+	expr_cg_xoperation_case(MULTIPLICATION, "mul", "");
+	expr_cg_xoperation_case(DIVISION, "div", "s");
+	expr_cg_xoperation_case(ADDITION, "add", "");
+	expr_cg_xoperation_case(SUBSTRACTION, "sub", "");
+	expr_cg_xoperation_case(LOWER, "cmp slt", "i");
+	expr_cg_xoperation_case(GREATER, "cmp slt", "i");
+	expr_cg_xoperation_case(LEQ, "cmp sle", "i");
+	expr_cg_xoperation_case(GEQ, "cmp sge", "i");
+	expr_cg_xoperation_case(NEQ, "cmp ne", "i");
+	expr_cg_xoperation_case(EQ, "cmp eq", "i");
 	
     default:
 	internal_error("expr_cg_operation: default clause reached");
 	break;
     }
 }
+#undef expr_cg_xoperation_case
+
 
 const char *expr_cg_rvalue_eval(const struct expression *e)
 {
