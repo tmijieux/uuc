@@ -89,7 +89,7 @@ expression
 	break;
 	
     default:
-	fatal_error2("default clause reached, assignment operator");
+	internal_error("default clause reached, assignment operator");
 	break;
     }
  }

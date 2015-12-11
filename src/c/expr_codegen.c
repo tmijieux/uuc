@@ -94,7 +94,7 @@ void expr_cg_xcrement(struct expression *e)
 	expr_cg_pre_xcrement(e, "sub");
 	break;
     default:
-	fatal_error2("expr_cg_xcrement: default clause reached");
+	internal_error("expr_cg_xcrement: default clause reached");
     }
 }
 
@@ -143,7 +143,7 @@ void expr_cg_xoperation(struct expression *e)
 	break;
 	
     default:
-	fatal_error2("expr_cg_operation: default clause reached");
+	internal_error("expr_cg_operation: default clause reached");
 	break;
     }
 }

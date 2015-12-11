@@ -51,7 +51,6 @@ void error(const char *format, ...)
 	error_(ERR_COMPILATION, format, ap, color("red", "error"));
 }
 
-
 static void fatal_error__(int error_type, const char *format, va_list ap)
 {
 	++errc;
@@ -65,19 +64,11 @@ void fatal_error(const char *format, ...)
 	fatal_error__(ERR_COMPILATION, format, ap);
 }
 
-void fatal_error2(const char *format, ...)
-{
-
-	va_list ap; va_start(ap, format);
-	fatal_error__(ERR_OTHER, format, ap);
-}
-
 void internal_error(const char *format, ...)
 {
 	va_list ap; va_start(ap, format);
 	fatal_error__(ERR_OTHER, format, ap);
 }
-
 
 extern const char *old_yytext[];
 extern unsigned int old_yytext_index;

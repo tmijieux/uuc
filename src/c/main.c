@@ -31,7 +31,7 @@ int main(int argc, char *argv[])
 		}
 	} else {
 		yyfilename = *argv;
-		fatal_error2( "no input file\n" );
+		internal_error( "\nusage: %s sourcefile.u\n", argv[0] );
 		return EXIT_FAILURE;
 	}
 	yyparse();

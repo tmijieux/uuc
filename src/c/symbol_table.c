@@ -40,7 +40,7 @@ void st_set_parameters(struct list *l)
     }
     else
     {
-	fatal_error2("st_set_parameter was called inside a block\n");
+	internal_error("st_set_parameter was called inside a block\n");
     }
 }
 
