@@ -75,7 +75,6 @@ static void expr_cg_pre_xcrement(struct expression *e, const char *op)
     e->var = d1;
 }
 
-
 // << -- helpers end --
 
 void expr_cg_xcrement(struct expression *e)
@@ -423,76 +422,41 @@ void expr_cg_constant(struct expression *e)
     // TODO handle for float/ simplify rvalue_eval
 }
 
+
 void expr_cg_funcall_params(struct expression *e)
 {
+    char *params_code = "";
+    char *params_val = "";
+    char *call_code = "";
+    
     int s = list_size(e->args);
-    const char *typestr = type_cg(e->type);
+    for (int i = 1; i <= s; ++i)
     {
-	struct expression *arg;
-	char *tmp = "";
-	for (int i = 1; i <= s; ++i)
-	{
-			
-	    arg =  list_get(e->args, i);
-	    expr_cg(arg);
-			
-	    asprintf(&e->rvalue_code, "%s%s",
-		     tmp, arg->rvalue_code);
-	    tmp = e->rvalue_code;
-	}
-	e->rvalue_code = tmp;
+	struct expression *arg;			
+	arg = list_get(e->args, i);
+	expr_cg(arg);
+	asprintf(&params_code, "%s%s",  params_code, arg->rvalue_code);
+	asprintf(&params_val,"%s%s %s%s", params_val, type_cg(arg->type),
+		 expr_cg_rvalue_eval(arg),  i==s?"":",");
     }
+
+    asprintf(&call_code, "call %s @%s(%s)\n",
+	     type_cg(e->type), e->symbol->name, params_val);
+    
     if ( e->type != type_void )
     {
 	int d = prgm_get_unique_id();
 	e->var = d;
-	asprintf(&e->rvalue_code,
-		 "%s"  // code of arguments
-		 "%%t%u = call %s @%s(",
-		 e->rvalue_code,
-		 d, typestr, e->symbol->name);
+	asprintf(&call_code, "%%t%u = %s", d, call_code);
     }
-    else
-    {
-	asprintf(&e->rvalue_code,
-		 "%s"  // code of arguments
-		 "call %s @%s(",
-		 e->rvalue_code,
-		 typestr, e->symbol->name);
-    }
-	
-    {
-	struct expression *arg;
 
-	for (int i = 1; i <= s; ++i)
-	{
-	    arg = list_get(e->args, i);
-	    asprintf(&e->rvalue_code,"%s%s %s%s",
-		     e->rvalue_code,
-		     type_cg(arg->type),
-		     expr_cg_rvalue_eval(arg),
-		     i==s?")\n":",");
-	}
-    }
+    asprintf(&e->rvalue_code, "%s%s", params_code, call_code);
 }
 
 void expr_cg_funcall(struct expression *e)
 {
-    const char *typestr = type_cg(e->type);
-    if ( e->type != type_void )
-    {
-	int d = prgm_get_unique_id();
-	e->var = d;
-	asprintf(&e->rvalue_code,
-		 "%%t%u = call %s @%s()\n",
-		 d, typestr, e->symbol->name);
-    }
-    else
-    {
-	asprintf(&e->rvalue_code,
-		 "call %s @%s()\n",
-		 typestr, e->symbol->name);
-    }
+    e->args = list_new(0);
+    expr_cg_funcall_params(e);
 }
 
 void expr_cg_postfix(struct expression *e)
