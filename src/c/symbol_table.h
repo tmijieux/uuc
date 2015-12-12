@@ -14,4 +14,4 @@ int st_search(const char *name, struct symbol **sy_ret);
 
 void st_set_parameters(struct list *l);
 
-#endif //SYMBOL_TABLE_H
+#endif	//SYMBOL_TABLE_H

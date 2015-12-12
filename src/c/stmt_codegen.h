@@ -10,5 +10,5 @@ void stmt_cg_while(struct statement *st);
 void stmt_cg_do_while(struct statement *st);
 void stmt_cg_return_void(struct statement *st);
 void stmt_cg_return(struct statement *st);
-	
-#endif //STATEMENT_CODEGEN_H
+
+#endif	//STATEMENT_CODEGEN_H

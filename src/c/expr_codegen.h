@@ -1,7 +1,7 @@
 #ifndef EXPR_CODEGEN_H
 #define EXPR_CODEGEN_H
 
-void expr_cg(const struct expression*);
+void expr_cg(const struct expression *);
 
 void expr_cg_map(struct expression *e);
 void expr_cg_reduce(struct expression *e);
@@ -21,4 +21,4 @@ void expr_cg_array_size(struct expression *e);
 void expr_cg_xcrement(struct expression *e);
 void expr_cg_xoperation(struct expression *e);
 
-#endif //EXPR_CODEGEN_H
+#endif	//EXPR_CODEGEN_H

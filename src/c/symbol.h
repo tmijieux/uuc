@@ -12,7 +12,7 @@
 
 enum symbol_type {
     SYM_VARIABLE,
-    SYM_FUNCTION        // no storage, always resolved at compile/link time
+    SYM_FUNCTION // no storage, always resolved at compile/link time
 };
 
 enum variable_storage {
@@ -48,7 +48,7 @@ struct symbol_variable {
     const char *init_code;
     // for retrieving parameter value and
     // allocate the arrays
-    
+
     int assigned_constant;
     enum enum_type constant_type;
     union {
@@ -58,17 +58,17 @@ struct symbol_variable {
 };
 
 struct symbol_function {
-    
+
 };
-    
+
 struct symbol {
     const char *name;
-    
+
     /**
        suffix is used to differentiate between
        generated code and user code   */
     const char *suffix;
-    
+
     enum symbol_type symbol_type;
     const struct type *type;
 
@@ -77,7 +77,7 @@ struct symbol {
 
     int level;
     int unique_id;
-	
+
     size_t size;
     union {
 	struct symbol_variable variable;
@@ -89,10 +89,10 @@ struct symbol *symbol_new(const char *name, const struct type *t);
 
 // check a symbol is defined in the symbol_table and get it
 // or return NULL if it is not defined
-struct symbol * symbol_check(const char *name);
+struct symbol *symbol_check(const char *name);
 
 // symbol helpers
 void symbol_print(const struct symbol *sy);
 char *symbol_fully_qualified_name(const struct symbol *sym);
 
-#endif //SYMBOL_H
+#endif	//SYMBOL_H

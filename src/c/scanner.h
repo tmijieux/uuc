@@ -3,4 +3,4 @@
 
 #define YYOLDTEXT_SIZE 15
 
-#endif //SCANNER_H
+#endif	//SCANNER_H

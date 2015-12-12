@@ -12,14 +12,14 @@
 
 struct symbol *symbol_new(const char *name, const struct type *t)
 {
-    struct symbol *sy = calloc(sizeof*sy, 1);
+    struct symbol *sy = calloc(sizeof *sy, 1);
     sy->name = name;
     sy->type = t;
-    sy->variable = (struct symbol_variable) { 0 };
+    sy->variable = (struct symbol_variable) {0};
     sy->unique_id = prgm_get_unique_id();
-    sy->suffix = "input.stack"; // DEFAULT
+    sy->suffix = "input.stack";	// DEFAULT
     /* used to differentiate between generated code and user code   */
-    
+
     sy->variable.alloc_code = NULL;
     sy->variable.init_code = "";
 
@@ -36,11 +36,11 @@ void symbol_print(const struct symbol *sy)
 struct symbol *symbol_check(const char *name)
 {
     struct symbol *sy = NULL;
-    if ( !st_search(name, &sy) ) {
+    if (!st_search(name, &sy)) {
 	error("undefined reference to %s\n", name);
 	sy = symbol_new(name, type_generic);
     }
-	    
+
     return sy;
 }
 
@@ -49,6 +49,6 @@ char *symbol_fully_qualified_name(const struct symbol *sym)
     char *level, *name;
     asprintf(&level, ".%d", sym->unique_id);
     asprintf(&name, "%s%s.%s%s", sym->variable.is_global ? "@" : "%",
-	     sym->name, sym->suffix, (sym->level>0)?level:"");
+	     sym->name, sym->suffix, (sym->level > 0) ? level : "");
     return name;
 }

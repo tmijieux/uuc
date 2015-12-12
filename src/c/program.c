@@ -5,6 +5,6 @@
 
 unsigned int prgm_get_unique_id(void)
 {
-	static unsigned int unique = 0;
-	return unique ++;
+    static unsigned int unique = 0;
+    return unique++;
 }
