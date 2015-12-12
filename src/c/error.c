@@ -89,10 +89,11 @@ int yyerror(const char *s)
 	 i != old_yytext_index; i = (i + 1) % YYOLDTEXT_SIZE) {
 	asprintf(&source_code, "%s%s", source_code, old_yytext[i]);
     }
+    asprintf(&source_code, "%s%s", source_code, yytext);
     len +=
 	fprintf(ERROR_OUTPUT, "%s\n",
 		strstrip(color("green", source_code))) - COLOR_LEN;
-    for (int i = 0; i < len - 1; ++i)
+    for (int i = 0; i < len - 2; ++i)
 	fputc(' ', ERROR_OUTPUT);
     fputs(color("fushia", "^\n"), ERROR_OUTPUT);
     return 0;

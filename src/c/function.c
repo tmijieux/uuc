@@ -9,6 +9,8 @@
 #include "codegen.h"
 #include "statement.h"
 #include "error.h"
+#include "symbol_table.h"
+#include "module.h"
 
 struct function *current_fun = NULL;
 
@@ -124,4 +126,27 @@ void fun_cg(struct function *fun)
 		 decl_init_list(type_function_argv(fun->type)), compnd->code);
 	fun->vcode = funcode;
     }
+}
+
+struct symbol *
+function_declare(struct symbol *declarator, struct list *param_list)
+{
+    declarator->type = type_new_function_type(declarator->type, param_list);
+    st_set_parameters(param_list);
+    declarator->symbol_type = SYM_FUNCTION;
+
+    struct symbol *tmpsy;
+    if ( !st_search(declarator->name, &tmpsy) ) {
+	// first declaration : add to the table
+	st_add(declarator);
+    } else {
+	if ( !type_equal( tmpsy->type, declarator->type ) ) {
+	    error("declaration of function '%s' does "
+		  "not match previous declaration\n", declarator->name);
+	}
+    }
+
+    last_function_return_type = declarator->type->function_type.return_value;
+    current_fun = module_get_or_create_function(m, declarator);
+    return declarator;
 }

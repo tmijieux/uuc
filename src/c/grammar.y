@@ -17,9 +17,10 @@
 #include "program.h"
 #include "codegen.h"
 #include "module.h"
-	
-    extern int yylex();
-    %}
+    
+extern int yylex();
+struct list *declarator_list_append(struct list *l, struct symbol *s);
+%}
 
 %token <str> TOKEN_IDENTIFIER
 %token <i> TOKEN_CONSTANTI
@@ -116,12 +117,10 @@ primary_expression
 | TOKEN_CONSTANTI { $$ = expr_constant(type_int, $1); }
 | TOKEN_CONSTANTF { $$ = expr_constant(type_float, $1); }
 | '(' expression ')' { $$ = $2; }
-| TOKEN_MAP '(' postfix_expression ',' postfix_expression ')' {
-    $$ = expr_map($3, $5);
-  }
-| TOKEN_REDUCE '(' postfix_expression ',' postfix_expression ')' {
-    $$ = expr_reduce($3, $5);
-  }
+| TOKEN_MAP '(' postfix_expression ',' postfix_expression ')'
+  { $$ = expr_map($3, $5); }
+| TOKEN_REDUCE '(' postfix_expression ',' postfix_expression ')'
+  { $$ = expr_reduce($3, $5); }
 | TOKEN_IDENTIFIER '(' ')'  {   // funcall
     struct symbol *sy = symbol_check($1);
     $$ = expr_funcall(sy, list_new(0));
@@ -149,47 +148,29 @@ unary_expression
 
 multiplicative_expression
 : unary_expression               { $$ = $1; }
-| multiplicative_expression '*' unary_expression  {
-    $$ = expr_multiplication($1, $3);
-  }
-| multiplicative_expression '/' unary_expression {
-    $$ = expr_division($1, $3);
-  }
+| multiplicative_expression '*' unary_expression
+{ $$ = expr_multiplication($1, $3); }
+| multiplicative_expression '/' unary_expression
+{ $$ = expr_division($1, $3); }
 ;
 
 additive_expression
 : multiplicative_expression             { $$ = $1; }
-| additive_expression '+' multiplicative_expression {
-    $$ = expr_addition($1, $3);
-  }
-| additive_expression '-' multiplicative_expression {
-    $$ = expr_substraction($1, $3);
-  }
-| '(' type_name ')' additive_expression {
-    $$ = expr_cast($4, last_type_name);
-  }
+| additive_expression '+' multiplicative_expression
+{ $$ = expr_addition($1, $3); }
+| additive_expression '-' multiplicative_expression
+{  $$ = expr_substraction($1, $3); }
+| '(' type_name ')' additive_expression { $$ = expr_cast($4, last_type_name); }
 ;
 
 comparison_expression
 : additive_expression              { $$ = $1; }
-| additive_expression '<' additive_expression {
-    $$ = expr_lower($1, $3);
-  }
-| additive_expression '>' additive_expression {
-    $$ = expr_greater($1, $3);
-  }
-| additive_expression TOKEN_LE_OP additive_expression {
-    $$ = expr_leq($1, $3);
- }
-| additive_expression TOKEN_GE_OP additive_expression {
-    $$ = expr_geq($1, $3);
- }
-| additive_expression TOKEN_EQ_OP additive_expression {
-    $$ = expr_eq($1, $3);
- }
-| additive_expression TOKEN_NE_OP additive_expression {
-    $$ = expr_neq($1, $3);
- }
+| additive_expression '<' additive_expression { $$ = expr_lower($1, $3);  }
+| additive_expression '>' additive_expression { $$ = expr_greater($1, $3); }
+| additive_expression TOKEN_LE_OP additive_expression { $$ = expr_leq($1, $3); }
+| additive_expression TOKEN_GE_OP additive_expression { $$ = expr_geq($1, $3); }
+| additive_expression TOKEN_EQ_OP additive_expression { $$ = expr_eq($1, $3); }
+| additive_expression TOKEN_NE_OP additive_expression { $$ = expr_neq($1, $3); }
 ;
 
 // ************ DECLARATIONS *****************/
@@ -207,27 +188,21 @@ external_declaration
     for (int i = 1; i <= si; ++i)
 	module_add_global(m, list_get($1, i));
  }
-| prototype { // %type < prototype > = < struct * symbol >
-    module_add_prototype(m, $1);
-  }
+| prototype { module_add_prototype(m, $1); }
+// %type < prototype > = < struct * symbol >
 ;
 
 function_definition
 : type_name function_declarator compound_statement {
-    struct function *fun;
-
-    fun = module_get_or_create_function(m, $2);
-    if ( fun_set_body(fun, $3) != 0 )
-    {
+    struct function *fun = module_get_or_create_function(m, $2);
+    if ( fun_set_body(fun, $3) != 0 ) {
 	fatal_error("multiple definition for function %s\n", $2->name);
     }
  }
 ;
 
 prototype
-: type_name function_declarator ';' {
-    $$ = $2;
- }
+: type_name function_declarator ';' {  $$ = $2; }
 ;
 
 // *** declaration
@@ -282,69 +257,14 @@ declarator
 
 // %type ( funtion_declarator )  = < struct symbol * >
 function_declarator
-: declarator '(' parameter_list ')'  {
-    $$ = $1;
-    $$->type = type_new_function_type($1->type, $3);
-    st_set_parameters($3);
-    $$->symbol_type = SYM_FUNCTION;
-
-    struct symbol *tmpsy;
-    if ( !st_search($1->name, &tmpsy) )
-    {
-	// first declaration : add to the table
-	st_add($1);
-    }
-    else
-    {
-	if ( !type_equal( tmpsy->type, $$->type ) )
-	{
-	    error("declaration of function '%s' does "
-		  "not match previous declaration\n", $$->name);
-	}
-    }
-
-    last_function_return_type = $$->type->function_type.return_value;
-    current_fun = module_get_or_create_function(m, $$);
- }
-| declarator '(' ')' {
-    $$ = $1;
-    struct list *l = list_new(0);
-    $$->type = type_new_function_type($1->type, l);
-    st_set_parameters(NULL);
-	
-    struct symbol *tmpsy;
-    if ( !st_search($1->name, &tmpsy) )
-    {
-	st_add($1);
-    }
-    else
-    {
-	if ( !type_equal( tmpsy->type, $$->type ) )
-	{
-	    error("declaration of function '%s' does not "
-		  "match prototype\n", $$->name);
-	}
-    }
-    last_function_return_type = $$->type->function_type.return_value;
-    current_fun = module_get_or_create_function(m, $$);
-  }
+: declarator '(' parameter_list ')'{ $$ = function_declare($1, $3); }
+| declarator '(' ')' { $$ = function_declare($1, list_new(0)); }
 ;
 
 // %type ( declarator_list ) = < struct list * < struct symbol *>  >
 declarator_list
-: declarator                     {
-    $$ = list_new(0);
-    list_append($$, $1);
-    if ( !st_add($1) )
-	error("symbol multiple definition: %s \n", $1->name);
- }
-| declarator_list ',' declarator {
-    $$ = $1;
-    list_append($$, $3);
-    if ( !st_add($3) )
-	error("symbol multiple definition: %s \n", $3->name);
-    // TODO factorize those two rules 
-  }
+: declarator   { $$ = declarator_list_append(list_new(0), $1); }
+| declarator_list ',' declarator { $$ = declarator_list_append($1, $3); }
 ;
 
 // *** PARAMETER DECL
@@ -363,12 +283,8 @@ parameter_declaration
 
 // % type ( parameter_list ) = < struct list * < struct symbol * > >
 parameter_list
-: parameter_declaration {
-    $$ = list_new(0); list_append($$, $1);
- }
-| parameter_list ',' parameter_declaration {
-    $$ = $1; list_append($$, $3);
-  }
+: parameter_declaration {  $$ = list_new(0); list_append($$, $1); }
+| parameter_list ',' parameter_declaration {  $$ = $1; list_append($$, $3); }
 ;
 
 /************* STATEMENTS  **************/
@@ -410,44 +326,37 @@ compound_statement
 ;
 
 expression_statement
-: ';'  {
-    $$ = stmt_expression(NULL);
- }
-| expression ';' {
-    $$ = stmt_expression($1);
-  }
+: ';'  {  $$ = stmt_expression(NULL); }
+| expression ';' {  $$ = stmt_expression($1); }
 ;
 
 selection_statement
-: TOKEN_IF '(' expression ')' statement {
-    $$ = stmt_if($3, $5);
- }
-| TOKEN_IF '(' expression ')' statement TOKEN_ELSE statement {
-    $$ = stmt_if_else($3, $5, $7);
-  }
+: TOKEN_IF '(' expression ')' statement {  $$ = stmt_if($3, $5); }
+| TOKEN_IF '(' expression ')' statement TOKEN_ELSE statement
+ { $$ = stmt_if_else($3, $5, $7);  }
 | TOKEN_FOR '(' expression_statement expression_statement expression ')' statement
-{
-    $$ = stmt_for($3->expr, $4->expr, $5, $7);
-}
+ { $$ = stmt_for($3->expr, $4->expr, $5, $7); }
 ;
 
 iteration_statement
-: TOKEN_WHILE '(' expression ')' statement {
-    $$ = stmt_while($3, $5);
- }
-| TOKEN_DO statement TOKEN_WHILE '(' expression ')' ';' {
-    $$ = stmt_do_while($5, $2);
- }
+: TOKEN_WHILE '(' expression ')' statement {  $$ = stmt_while($3, $5); }
+| TOKEN_DO statement TOKEN_WHILE '(' expression ')' ';'
+{ $$ = stmt_do_while($5, $2); }
 ;
 
 jump_statement
-: TOKEN_RETURN ';' {
-    $$ = stmt_return_void();
- }
-| TOKEN_RETURN expression ';' {
-    $$ = stmt_return($2);
- }
+: TOKEN_RETURN ';' {  $$ = stmt_return_void(); }
+| TOKEN_RETURN expression ';' {   $$ = stmt_return($2); }
 ;
 /************************************************/
 
 %%
+
+struct list *declarator_list_append(struct list *l, struct symbol *s)
+{
+    list_append(l, s);
+    if (!st_add(s)) {
+	error("symbol multiple definition: %s \n", s->name);
+    }
+    return l;
+}

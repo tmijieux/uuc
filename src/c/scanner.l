@@ -73,14 +73,14 @@ int yywrap()
 /* This function reads a comment. Comments are not part of the grammar. */
 static int comment(void)
 {
-	char c, c1;
-loop:
-	while ((c = input()) != '*' && c != 0);
-	if ((c1 = input()) != '/' && c != 0) {
-		unput(c1);
-		goto loop;
-	}
-	return 0;
+    char c, c1;
+  loop:
+    while ((c = input()) != '*' && c != 0);
+    if ((c1 = input()) != '/' && c != 0) {
+	unput(c1);
+	goto loop;
+    }
+    return 0;
 }
 
 int yycolno = 0;

@@ -129,10 +129,6 @@ void st_push(void)
     st = tmp;
 
     if (st->level == 1)	{ // if we just entered inside a function
-	if (function_parameters == NULL)
-	    return;	// no arguments to the function
-	
-	
 	int s = list_size(function_parameters);
 	for (int i = 1; i <= s; ++i) {
 	    // push the function parameters to the declared symbols
@@ -146,7 +142,7 @@ void st_push(void)
 	    if (!st_add(tmp))
 		error("symbol multiple definition: %s \n", tmp->name);
 	}
-	function_parameters = NULL;	// ... and reset the list
+	function_parameters = list_new(0);	// ... and reset the list
     }
 }
 
