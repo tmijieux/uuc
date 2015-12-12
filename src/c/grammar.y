@@ -124,7 +124,7 @@ primary_expression
   }
 | TOKEN_IDENTIFIER '(' ')'  {   // funcall
     struct symbol *sy = symbol_check($1);
-    $$ = expr_funcall(sy, NULL);
+    $$ = expr_funcall(sy, list_new(0));
   }
 | TOKEN_IDENTIFIER '(' argument_expression_list ')' { // funcall with parameter
     struct symbol *sy = symbol_check($1);

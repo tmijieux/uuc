@@ -93,6 +93,6 @@ struct symbol * symbol_check(const char *name);
 
 // symbol helpers
 void symbol_print(const struct symbol *sy);
-const char * symbol_fully_qualified_name(const struct symbol *sym);
+char *symbol_fully_qualified_name(const struct symbol *sym);
 
 #endif //SYMBOL_H

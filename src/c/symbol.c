@@ -44,17 +44,12 @@ struct symbol *symbol_check(const char *name)
     return sy;
 }
 
-const char * symbol_fully_qualified_name(const struct symbol *sym)
+char *symbol_fully_qualified_name(const struct symbol *sym)
 {
-	char *level;
-	asprintf(&level, ".%d", sym->unique_id);
-	
-	char *name;
-	asprintf(&name, "%s%s.%s%s",
-		 sym->variable.is_global ? "@" : "%",
-		 sym->name, sym->suffix,
-		 (sym->level>0)?level:"");
-
-	return name;
+    char *level, *name;
+    asprintf(&level, ".%d", sym->unique_id);
+    asprintf(&name, "%s%s.%s%s", sym->variable.is_global ? "@" : "%",
+	     sym->name, sym->suffix, (sym->level>0)?level:"");
+    return name;
 }
 

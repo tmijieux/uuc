@@ -51,21 +51,6 @@ void symb_cg(struct symbol *sy)
 	}
 }
 
-static const struct expression *expr_array_copy(const struct expression *expr)
-{
-	struct expression * cpy = malloc(sizeof*cpy);
-	memcpy(cpy, expr, sizeof*cpy);
-	
-	cpy->var = prgm_get_unique_id();
-	if (cpy->expression_type == EXPR_POSTFIX)
-	{
-		cpy->array = expr_array_copy(cpy->array);
-		cpy->index = expr_array_copy(cpy->index);
-	}
-	expr_cg(cpy);
-	return cpy;
-}
-
 // cette fonction est RECURSIVE (dans le compilateur)
 // mais genere des boucles imbriqués (iteratives) dans le programme généré
 // pour allouer les tableaux à dimensions multiples

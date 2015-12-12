@@ -10,9 +10,6 @@
 const char *type_cg(const struct type*);
 const char *type_cg_arglist(const struct list*); // list of symbols
 const char *type_cg_arglist_nameless(const struct list*);
-	
-const char *expr_cg_rvalue_eval(const struct expression*);
-const char *expr_cg_lvalue_eval(const struct expression*);
 
 void symb_cg(struct symbol*);
 void expr_cg(const struct expression*);

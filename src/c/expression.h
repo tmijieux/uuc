@@ -73,13 +73,13 @@ struct expression {
 	const struct type *target_type;
     };
 
-    char *lvalue_code;
-    char *rvalue_code;
+    char *vcode; // code for computing value
+    char *vreg; // register for value
+    
+    char *acode; // code for computing address
+    char *areg; // register for address
     
     char *source_code;
-    
-    unsigned int var; // register number of the expression
-    unsigned int lvalue_var; // register number of the expression
 
     void (*codegen)(struct expression *);
     // why c++ when you have c

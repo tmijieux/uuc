@@ -16,12 +16,8 @@
 static struct expression *expr_new(enum expression_type ext)
 {
     struct expression *expr = calloc(sizeof(*expr), 1);
-	
     expr->expression_type = ext;
-    expr->lvalue_code = "";
-    expr->rvalue_code = "";
-    expr->source_code = "";
-	
+    expr->vcode = expr->acode = expr->vreg = expr->areg = expr->source_code = "";
     return expr;
 }
 
@@ -35,7 +31,6 @@ is_not_zero_constant_expr(const struct expression *expr)
 	if ( expr->type == type_long && expr->constantl == 0)
 	    return false;
     }
-
     return true;
 }
 
@@ -66,7 +61,7 @@ static void cast_to_greatest_precision(struct expression *expr)
 	expr->right_operand = expr_cast(
 	    expr->right_operand,
 	    expr->left_operand->type
-	    );
+	);
     }
     else if ( type_precision( expr->left_operand->type ) <
 	      type_precision( expr->right_operand->type ) )
@@ -74,7 +69,7 @@ static void cast_to_greatest_precision(struct expression *expr)
 	expr->left_operand = expr_cast(
 	    expr->left_operand,
 	    expr->right_operand->type
-	    );
+	);
     }
 }
 
@@ -83,9 +78,10 @@ const struct expression *expr_symbol(struct symbol *sym)
     struct expression *expr = expr_new(EXPR_SYMBOL);
 
     expr->type = sym->type;
-
     expr->symbol = sym;
     expr->codegen = &expr_cg_symbol;
+    expr->areg = symbol_fully_qualified_name(sym);
+    
     return expr;
 }
 
@@ -180,7 +176,7 @@ expr_map(const struct expression *fun, const struct expression *array)
 	    type_function_return( fun->type ),
 	    expr_array_size( array )
 	    //type_array_size( array->type )
-	    );
+	);
 		
     }
     else
@@ -266,20 +262,12 @@ expr_reduce(const struct expression *fun, const struct expression *array)
 
 const struct expression *expr_funcall(struct symbol *fun, struct list *args)
 {
-    struct expression *expr;
-    if ( args != NULL )
-    {
-	expr = expr_new( EXPR_FUNCALL_PARAMS );
-	expr->codegen = &expr_cg_funcall_params;
-    }
-    else
-    {
-	expr = expr_new( EXPR_FUNCALL );
-	expr->codegen = &expr_cg_funcall;
-    }
-
+    struct expression *expr = expr_new( EXPR_FUNCALL );
+    expr->codegen = &expr_cg_funcall;
     expr->args = args;
     expr->symbol = fun;
+
+    assert( args != NULL );
 
     if ( !type_is_function(fun->type) )
     {
@@ -290,7 +278,6 @@ const struct expression *expr_funcall(struct symbol *fun, struct list *args)
 	
     const struct list *proto =  type_function_argv(fun->type);
     unsigned int s = list_size(proto);
-
 
     expr->type = type_function_return(fun->type);
 		

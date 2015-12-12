@@ -7,7 +7,6 @@ void expr_cg_map(struct expression *e);
 void expr_cg_reduce(struct expression *e);
 void expr_cg_symbol(struct expression *e);
 void expr_cg_constant(struct expression *e);
-void expr_cg_funcall_params(struct expression *e);
 void expr_cg_funcall(struct expression *e);
 void expr_cg_postfix(struct expression *e);
 void expr_cg_unary_minus(struct expression *e);

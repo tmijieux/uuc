@@ -50,7 +50,7 @@ void stmt_cg_expression(struct statement *st)
 {
 	assert ( NULL != st->expr );
 	expr_cg(st->expr);
-	st->code = st->expr->rvalue_code;
+	st->code = st->expr->vcode;
 }
 
 void stmt_cg_compound(struct statement *st)
@@ -74,8 +74,8 @@ void stmt_cg_if(struct statement *st)
 		 "%s"
 		 "br label %%end%u\n"
 		 "end%u:\n",
-		 d, d, st->if_cond->rvalue_code,
-		 expr_cg_rvalue_eval(st->if_cond), d, d,
+		 d, d, st->if_cond->vcode,
+		 st->if_cond->vreg, d, d,
 		 d, st->then->code, d,  d);
 }
 
@@ -97,8 +97,8 @@ void stmt_cg_if_else(struct statement *st)
 		 "%s"
 		 "br label %%end%u\n"
 		 "end%u:\n",
-		 d, d, st->if_cond->rvalue_code,
-		 expr_cg_rvalue_eval(st->if_cond), d, d,
+		 d, d, st->if_cond->vcode,
+		 st->if_cond->vreg, d, d,
 		 d, st->then->code, d, d,
 		 st->eelse->code, d, d);
 }
@@ -122,9 +122,9 @@ void stmt_cg_for(struct statement *st)
 		 "%s"
 		 "br label %%cond%u\n"
 		 "end%u:\n",
-		 st->init->rvalue_code, d, d, st->loop_cond->rvalue_code,
-		 expr_cg_rvalue_eval(st->loop_cond), d, d, d,
-		 st->body->code, st->next->rvalue_code, d, d); 
+		 st->init->vcode, d, d, st->loop_cond->vcode,
+		 st->loop_cond->vreg, d, d, d,
+		 st->body->code, st->next->vcode, d, d); 
 }
 
 void stmt_cg_while(struct statement *st)
@@ -141,8 +141,8 @@ void stmt_cg_while(struct statement *st)
 		 "%s"
 		 "br label %%cond%u\n"
 		 "end%u:\n",
-		 d, d, st->loop_cond->rvalue_code,
-		 expr_cg_rvalue_eval(st->loop_cond), d, d,   d,
+		 d, d, st->loop_cond->vcode,
+		 st->loop_cond->vreg, d, d,   d,
 		 st->body->code, d, d);
 }
 
@@ -158,8 +158,8 @@ void stmt_cg_do_while(struct statement *st)
 		 "%s"
 		 "br i1 %s, label %%start%u, label %%end%u\n"
 		 "end%u:\n",
-		 d, d, st->body->code, st->loop_cond->rvalue_code,
-		 expr_cg_rvalue_eval(st->loop_cond), d, d, d);
+		 d, d, st->body->code, st->loop_cond->vcode,
+		 st->loop_cond->vreg, d, d, d);
 }
 
 void stmt_cg_return_void(struct statement *st)
@@ -173,8 +173,8 @@ void stmt_cg_return(struct statement *st)
 	asprintf(&st->code,
 		 "%s"
 		 "ret %s %s\n",
-		 st->expr->rvalue_code, type_cg(st->expr->type),
-		 expr_cg_rvalue_eval(st->expr));
+		 st->expr->vcode, type_cg(st->expr->type),
+		 st->expr->vreg);
 }
 
 
