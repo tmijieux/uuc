@@ -12,7 +12,6 @@
 #include "color.h"
 #include "expr_codegen.h"
 
-
 static struct expression *expr_new(enum expression_type ext)
 {
     struct expression *expr = calloc(sizeof(*expr), 1);
@@ -258,8 +257,6 @@ expr_reduce(const struct expression *fun, const struct expression *array)
     return expr;
 }
 
-
-
 const struct expression *expr_funcall(struct symbol *fun, struct list *args)
 {
     struct expression *expr = expr_new( EXPR_FUNCALL );
@@ -281,13 +278,12 @@ const struct expression *expr_funcall(struct symbol *fun, struct list *args)
 
     expr->type = type_function_return(fun->type);
 		
-    if ((args == NULL && s != 0) || // check argument count
-	(args != NULL && list_size(args) != s))
+    if ( list_size(args) != s )
     {
 	error("%s: illegal number of arguments.\n", fun->name);
 	return expr;
     }
-	
+
     for (unsigned int i = 1; i <= s; ++i)
     {
 	struct symbol *tmp = list_get(proto, i);
@@ -309,7 +305,6 @@ const struct expression *expr_funcall(struct symbol *fun, struct list *args)
 	
     return expr;
 }
-
 
 const struct expression *
 expr_postfix(const struct expression *array, const struct expression *index)
@@ -338,7 +333,6 @@ expr_postfix(const struct expression *array, const struct expression *index)
     return expr;
 }
 
-
 const struct expression *expr_unary_minus(const struct expression *op)
 {
     struct expression *expr = expr_new( EXPR_UNARY_MINUS );
@@ -362,9 +356,7 @@ const struct expression *expr_unary_minus(const struct expression *op)
 // factorization for all increments and decrements:
 static const struct expression *
 xcrement(enum expression_type et,
-	 const struct expression *op,
-	 const char *opname)
-
+	 const struct expression *op, const char *opname)
 {
     struct expression *expr = expr_new( et );
 	
@@ -384,7 +376,6 @@ xcrement(enum expression_type et,
 	
     if ( expr->type != type_int && expr->type != type_generic )
     {
-	printf("%sLOLOL\n", type_printable(expr->type));
 	error("cannot %s on type %s\n", opname,
 	      color("yellow", type_printable(expr->type)));
 	expr->type = type_generic;
@@ -409,8 +400,6 @@ const struct expression *expr_post_inc(const const struct expression *op) {
 const struct expression *expr_pre_inc(const const struct expression *op) {
     return xcrement( EXPR_PRE_INC, op , "increment");
 }
-
-
 
 //factorization for all basic operations
 static const struct expression *
@@ -463,69 +452,57 @@ operation(enum expression_type et, const char *opname,
 }
 
 const struct expression *
-expr_neq(const const struct expression *lop, const struct expression *rop)
-{
+expr_neq(const const struct expression *lop, const struct expression *rop) {
     return operation( EXPR_NEQ, "comparison", lop, rop );
 }
 
 const struct expression *
-expr_eq(const struct expression *lop, const struct expression *rop)
-{
+expr_eq(const struct expression *lop, const struct expression *rop) {
     return operation( EXPR_EQ, "comparison", lop, rop );
 }
 
 const struct expression *
-expr_leq(const struct expression *lop, const struct expression *rop)
-{
+expr_leq(const struct expression *lop, const struct expression *rop) {
     return operation( EXPR_LEQ, "comparison", lop, rop );
 }
 
 const struct expression *
-expr_geq(const struct expression *lop, const struct expression *rop)
-{
+expr_geq(const struct expression *lop, const struct expression *rop) {
     return operation( EXPR_GEQ, "comparison", lop, rop );
 }
 
 const struct expression *
-expr_greater(const struct expression *lop, const struct expression *rop)
-{
+expr_greater(const struct expression *lop, const struct expression *rop) {
     return operation( EXPR_GREATER, "comparison", lop, rop );
 }
 
 const struct expression *
-expr_lower(const struct expression *lop, const struct expression *rop)
-{
+expr_lower(const struct expression *lop, const struct expression *rop) {
     return operation( EXPR_LOWER, "comparison", lop, rop );
 }
 
-
 const struct expression *
-expr_addition(const struct expression *lop, const struct expression *rop)
-{
+expr_addition(const struct expression *lop, const struct expression *rop) {
     return operation( EXPR_ADDITION, "addition", lop, rop );
 }
 
 const struct expression *
-expr_substraction(const struct expression *lop, const struct expression *rop)
-{
+expr_substraction(const struct expression *lop, const struct expression *rop) {
     return operation( EXPR_SUBSTRACTION, "substraction", lop, rop );
 }
 
 const struct expression *
-expr_multiplication(const struct expression *lop, const struct expression *rop)
-{
+expr_multiplication(const struct expression *lop, const struct expression *rop) {
     return operation( EXPR_MULTIPLICATION, "multiplication", lop, rop );
 }
 
 const struct expression *
-expr_division(const struct expression *lop, const struct expression *rop)
-{
+expr_division(const struct expression *lop, const struct expression *rop) {
     return operation( EXPR_DIVISION, "division", lop, rop );
 }
 
 const struct expression *
-expr_assignment(const struct expression *lop, const struct expression *rop)
-{
+expr_assignment(const struct expression *lop, const struct expression *rop) {
     struct expression *expr = expr_new( EXPR_ASSIGNMENT );
     expr->left_operand = lop;
     expr->right_operand = rop;
@@ -563,7 +540,6 @@ expr_assignment(const struct expression *lop, const struct expression *rop)
     expr->codegen = &expr_cg_assignment;
     return expr;
 }
-
 
 static struct expression *
 generic_cast_builder(enum expression_type et,
@@ -655,10 +631,9 @@ expr_array_size(const struct expression *array)
 	expr->type = type_generic;
 	return expr;
     }
-	
+
     expr->type = type_long;
     expr->array = array;
     expr->codegen = &expr_cg_array_size;
     return expr;
 }
-

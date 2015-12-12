@@ -201,14 +201,8 @@ void expr_cg_map(struct expression *e)
 	     reg[5], mapconttypestr, syname, reg[5]); // call map
 
     symb_cg(rettab_symb);
-    asprintf(&mapcont_code,
-	     "%s%s%s",
-	     rettab_symb->variable.alloc_code,
-	     rettab_symb->variable.init_code,
-	     mapcont_code);
-
-//	printf("rettab init code %s\n\n\n\n", rettab_symb->variable.init_code);
-	
+    asprintf(&mapcont_code, "%s%s%s", rettab_symb->variable.alloc_code,
+	     rettab_symb->variable.init_code, mapcont_code);
     e->vcode = mapcont_code;
     e->vreg = reg[4];
 }
@@ -228,7 +222,6 @@ void expr_cg_reduce(struct expression *e)
     new_registers(6, reg);
     int d1 ,d2;
     d1 = prgm_get_unique_id(); d2 = prgm_get_unique_id();
-
 
     // RETURN ARRAY:
     asprintf(&ret, "redret%u", d1);

@@ -52,4 +52,3 @@ char *symbol_fully_qualified_name(const struct symbol *sym)
 	     sym->name, sym->suffix, (sym->level>0)?level:"");
     return name;
 }
-
