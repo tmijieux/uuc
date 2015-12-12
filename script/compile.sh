@@ -31,7 +31,7 @@ if [ $# -ge 1 ]; then
 	if [[ "$extension" == "u" ]]; then
 	    echo "compiling $i"  
 	     # compile avec notre compilateur
-	    cpp -P $i > $a.1 || clean_die
+	    cpp -C -P $i > $a.1 || clean_die
 	    ${UUC} $a.1 > $a.2 || clean_die
 	    ${OPT} -std-compile-opts -mem2reg $a.2 > $a.3 || clean_die
 	    ${LLC} > $a.S < $a.3 || clean_die
