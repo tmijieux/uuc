@@ -3,4 +3,4 @@
 
 char *strstrip(const char *str);
 
-#endif //STRING__H
+#endif	//STRING__H

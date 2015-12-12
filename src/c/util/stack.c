@@ -10,7 +10,7 @@ struct stack {
 
 size_t stack_size(const struct stack *s)
 {
-    return (size_t)s->head + 1;
+    return (size_t) s->head + 1;
 }
 
 struct stack *stack_create(size_t buffer_size)
@@ -24,8 +24,8 @@ struct stack *stack_create(size_t buffer_size)
 
 void stack_push(struct stack *stack, STACK_TYPE element)
 {
-    if ( !stack_is_full(stack) ) {
-	stack->head ++;
+    if (!stack_is_full(stack)) {
+	stack->head++;
 	stack->buf[stack->head] = element;
     }
 }
@@ -35,12 +35,12 @@ STACK_TYPE stack_peek(const struct stack *stack)
     return stack->buf[stack->head];
 }
 
-STACK_TYPE stack_pop(struct stack *stack)
+STACK_TYPE stack_pop(struct stack * stack)
 {
     STACK_TYPE tmp;
-    if ( !stack_is_empty(stack) ) {
+    if (!stack_is_empty(stack)) {
 	tmp = stack->buf[stack->head];
-	stack->head --;
+	stack->head--;
     }
     return tmp;
 }

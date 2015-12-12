@@ -355,6 +355,7 @@ jump_statement
 struct list *declarator_list_append(struct list *l, struct symbol *s)
 {
     list_append(l, s);
+    s->symbol_type = SYM_VARIABLE;
     if (!st_add(s)) {
 	error("symbol multiple definition: %s \n", s->name);
     }

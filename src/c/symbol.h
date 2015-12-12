@@ -43,7 +43,8 @@ enum linkage {
 struct symbol_variable {
     int is_global;
     int is_parameter;
-
+    int used;
+    
     const char *alloc_code;
     const char *init_code;
     // for retrieving parameter value and
@@ -94,5 +95,6 @@ struct symbol *symbol_check(const char *name);
 // symbol helpers
 void symbol_print(const struct symbol *sy);
 char *symbol_fully_qualified_name(const struct symbol *sym);
+void symbol_use(struct symbol *sy);
 
 #endif	//SYMBOL_H

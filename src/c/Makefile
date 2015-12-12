@@ -1,6 +1,6 @@
 LEX=lex
 YACC=bison
-CFLAGS=-Wall -ggdb -O0 -std=gnu99 -I. -I./util 
+CFLAGS=-Wall -std=gnu99 -I. -I./util -O0 -ggdb
 LDFLAGS=-L. -lutil
 CC=cc
 SRC=	grammar.c \

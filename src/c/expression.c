@@ -70,6 +70,7 @@ const struct expression *expr_symbol(struct symbol *sym)
 
     expr->type = sym->type;
     expr->symbol = sym;
+    symbol_use(sym);
     expr->codegen = &expr_cg_symbol;
     expr->areg = symbol_fully_qualified_name(sym);
 

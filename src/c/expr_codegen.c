@@ -145,6 +145,7 @@ void expr_cg_map(struct expression *e)
 
     // printf("type map ret %s\n\n\n\n\n", type_printable(e->type));
     struct symbol *rettab_symb = symbol_new(rettab, e->type);
+    rettab_symb->symbol_type = SYM_VARIABLE;
     rettab_symb->suffix = "mapcg";
     symb_cg(rettab_symb);
 
@@ -212,6 +213,7 @@ void expr_cg_reduce(struct expression *e)
     // RETURN ARRAY:
     asprintf(&ret, "redret%u", d1);
     struct symbol *ret_symb = symbol_new(ret, e->type);
+    ret_symb->symbol_type = SYM_VARIABLE;
     ret_symb->suffix = "redcg";
     symb_cg(ret_symb);
 
@@ -350,7 +352,8 @@ void expr_cg_assignment(struct expression *e)
     e->vreg = e->right_operand->vreg;
 
     if (e->left_operand->expression_type == EXPR_SYMBOL)
-	assert(e->left_operand->symbol->symbol_type == SYM_VARIABLE);
+	assert(e->left_operand->symbol->type == type_generic ||
+	       e->left_operand->symbol->symbol_type == SYM_VARIABLE);
 
     const char *tstr = type_cg(e->left_operand->type);
     asprintf(&e->vcode, "%s%s store %s %s, %s* %s\n",

@@ -67,11 +67,14 @@ static const struct statement *st_array_alloc_rec(const struct expression
 
     l = list_new(0);
     fun_arg_sy = symbol_new("size", type_long);
+    fun_arg_sy->symbol_type = SYM_VARIABLE;
+    
     list_append(l, fun_arg_sy);	// prototype for GC_malloc
     malloc_type = type_new_function_type(type_generic, l);
 
     fun_sy = symbol_new("GC_malloc", malloc_type);
-
+    fun_sy->symbol_type = SYM_FUNCTION;
+    
     l = list_new(0);
 
     const struct expression *mul =
@@ -102,6 +105,7 @@ static const struct statement *st_array_alloc_rec(const struct expression
 	char *name;
 	asprintf(&name, "i%d", depth);
 	loop_counter_sy = symbol_new(name, type_int);
+	loop_counter_sy->symbol_type = SYM_VARIABLE;
 	loop_counter_sy->suffix = "alloc_gen";
 	symb_cg(loop_counter_sy);
 	fun_add_allocas(current_fun, loop_counter_sy);

@@ -32,6 +32,8 @@ static struct symbol_table *st = NULL;
  */
 static struct list *function_parameters = NULL;
 
+static void check_variable_use(const struct hash_table *);
+
 void st_set_parameters(struct list *l)
 {
     if (st->level == 0)	{ // this has no meaning inside a function
@@ -109,6 +111,7 @@ int st_search(const char *name, struct symbol **sy_ret)
 void st_pop(void)
 {
     if (st->level > 0) {
+	check_variable_use(st->ht);
 	ht_free(st->ht);
 	struct symbol_table *tmp = st->next;
 	free(st);
@@ -170,4 +173,16 @@ void st_exit(void)
 int st_level(void)
 {
     return st->level;
+}
+
+static void check_variable_use(const struct hash_table *ht)
+{
+    struct list *l = ht_to_list(ht);
+    int si = list_size(l);
+    for (int i = 1; i <= si; ++i) {
+	struct symbol *sy = list_get(l, i);
+	if (sy->symbol_type == SYM_VARIABLE && !sy->variable.used) {
+	    warning("unused variable %s\n", sy->name);
+	}
+    }
 }

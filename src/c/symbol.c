@@ -22,8 +22,14 @@ struct symbol *symbol_new(const char *name, const struct type *t)
 
     sy->variable.alloc_code = NULL;
     sy->variable.init_code = "";
-
+    sy->variable.used = false;
+    
     return sy;
+}
+
+void symbol_use(struct symbol *sy)
+{
+    sy->variable.used = true;
 }
 
 void symbol_print(const struct symbol *sy)

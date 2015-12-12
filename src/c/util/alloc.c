@@ -6,7 +6,7 @@
 
 void *gcmalloc(size_t size)
 {
-    return GC_MALLOC( size );
+    return GC_MALLOC(size);
 }
 
 void gcfree(void *ptr)
@@ -16,12 +16,12 @@ void gcfree(void *ptr)
 
 void *gccalloc(size_t nmemb, size_t size)
 {
-    void * ptr = GC_MALLOC( nmemb * size );
-    memset( ptr, 0, nmemb * size );
+    void *ptr = GC_MALLOC(nmemb * size);
+    memset(ptr, 0, nmemb * size);
     return ptr;
 }
 
 void *gcrealloc(void *ptr, size_t size)
 {
-    return GC_REALLOC( ptr, size );
+    return GC_REALLOC(ptr, size);
 }

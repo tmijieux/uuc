@@ -19,4 +19,4 @@ int stack_is_empty(const struct stack *s);
 int stack_is_full(const struct stack *s);
 size_t stack_size(const struct stack *s);
 
-#endif //STACK_H
+#endif	//STACK_H
