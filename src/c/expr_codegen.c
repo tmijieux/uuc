@@ -22,10 +22,23 @@ inline void expr_cg(const struct expression *e)
 
 // -- helpers -- >>
 
+
+static char* new_register(void)
+{
+	char *reg;
+	asprintf(&reg, "%%t%u", prgm_get_unique_id());
+	return reg;
+}
+
+static void new_registers(int n, char *tab[])
+{
+	for (int i = 0; i < n; i++)
+		tab[i] = new_register();
+}
+
 static void
 expr_cg_operation(struct expression *e, const char *op, const char *prefix)
 {
-
     expr_cg(e->left_operand);
     expr_cg(e->right_operand);
 	
@@ -98,9 +111,9 @@ void expr_cg_xcrement(struct expression *e)
 }
 
 
-#define expr_cg_xoperation_case(TYPE_, OPNAME_, SUFFIX_)		        \
+#define expr_cg_xoperation_case(TYPE_, OPNAME_, PREFIX_)		        \
     case EXPR_##TYPE_:						        	\
-        expr_cg_operation(e, OPNAME_, (e->type == type_float)?"f":SUFFIX_);	\
+        expr_cg_operation(e, OPNAME_, (e->type == type_float)?"f":PREFIX_);	\
         break
 
 void expr_cg_xoperation(struct expression *e)
@@ -483,7 +496,7 @@ void expr_cg_postfix(struct expression *e)
 	
     e->lvalue_code = code;
     e->lvalue_var = d2;
-	
+
     typestr = type_cg(e->type);	
     asprintf(&code,
 	     "%s"
@@ -494,7 +507,8 @@ void expr_cg_postfix(struct expression *e)
 }
 
 void expr_cg_unary_minus(struct expression *e)
-{
+{//TODO make expr_unary_minus return expresion_substraction(epxr_constant,
+    //and eventually remove this function
     const char *typestr = type_cg(e->operand->type);
     int d = prgm_get_unique_id();
 	
@@ -546,6 +560,7 @@ void expr_cg_assignment(struct expression *e)
     { // if the assignment is in an array
 	// add the code to get the pointer to the right element
 	// of the array in front:
+	// TODO add emtpy lvalue code for other expression
 	asprintf(&e->rvalue_code, "%s%s",
 		 e->left_operand->lvalue_code,
 		 e->rvalue_code);

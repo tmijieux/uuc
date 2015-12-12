@@ -359,7 +359,8 @@ const struct expression *expr_unary_minus(const struct expression *op)
     expr->operand = op;
     expr->type = op->type;
 	
-    if ( expr->type != type_int && expr->type != type_float &&
+    if ( expr->type != type_int &&
+	 expr->type != type_float &&
 	 expr->type != type_generic )
     {
 	error("unary minus does not apply to type %s\n",
