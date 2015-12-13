@@ -82,14 +82,11 @@ struct statement *stmt_for(const struct expression *init,
 			   const struct expression *next,
 			   const struct statement *body)
 {
-    struct statement *stmt = stmt_new(STMT_ITERATION);
-    cond = to_boolean(cond);
-    stmt->loop_cond = cond;
-    stmt->init = init;
-    stmt->body = body;
-    stmt->next = next;
-    stmt->codegen = &stmt_cg_for;
-    return stmt;
+    body = stmt_compound(NULL,
+			 list_new(LI_ELEM, body, stmt_expression(next), NULL));
+    struct list *li = list_new(LI_ELEM, stmt_expression(init),
+			       stmt_while(to_boolean(cond), body), NULL);
+    return stmt_compound(list_new(0), li);
 }
 
 struct statement *stmt_while(const struct expression *cond,

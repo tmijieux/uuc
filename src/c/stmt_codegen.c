@@ -102,30 +102,6 @@ void stmt_cg_if_else(struct statement *st)
 	     d, st->then->code, d, d, st->eelse->code, d, d);
 }
 
-void stmt_cg_for(struct statement *st)
-{
-    unsigned int d = prgm_get_unique_id();
-    expr_cg(st->init);
-    expr_cg(st->loop_cond);
-    stmt_cg(st->body);
-    expr_cg(st->next);
-
-    asprintf(&st->code,
-	     "%s"
-	     "br label %%cond%d\n"
-	     "cond%d:\n"
-	     "%s"
-	     "br i1 %s, label %%start%u, label %%end%u\n"
-	     "start%u:\n"
-	     "%s"
-	     "%s"
-	     "br label %%cond%u\n"
-	     "end%u:\n",
-	     st->init->vcode, d, d, st->loop_cond->vcode,
-	     st->loop_cond->vreg, d, d, d,
-	     st->body->code, st->next->vcode, d, d);
-}
-
 void stmt_cg_while(struct statement *st)
 {
     unsigned int d = prgm_get_unique_id();
