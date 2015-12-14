@@ -1,7 +1,7 @@
 LEX=lex
 YACC=bison
-CFLAGS=-Wall -std=gnu99 -I. -I./util -O0 -ggdb
-LDFLAGS=-L. -lutil
+CFLAGS=-Wall -std=gnu99 -I. -I./util -O0 -ggdb -I ~tmijieux/public/include
+LDFLAGS=-L. -lutil -L ~tmijieux/public/lib
 CC=cc
 SRC=	grammar.c \
 	scanner.c \
