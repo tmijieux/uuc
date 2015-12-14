@@ -74,7 +74,6 @@ void st_init(void)
 int st_add(struct symbol *sy)
 {
     sy->level = st->level;
-
     if (ht_has_entry(st->ht, sy->name))
 	return 0;
 

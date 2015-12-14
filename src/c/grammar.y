@@ -98,8 +98,8 @@ expression
 ;
 
 argument_expression_list
-: expression  { $$ = list_new(0); list_append($$, $1); }
-| argument_expression_list ',' expression { list_append($1, $3); }
+: expression  { list_append(($$ = list_new(0)), $1); }
+| argument_expression_list ',' expression { list_append($$ = $1, $3); }
 ;
 
 assignment_operator // type : char
@@ -160,7 +160,7 @@ additive_expression
 { $$ = expr_addition($1, $3); }
 | additive_expression '-' multiplicative_expression
 {  $$ = expr_substraction($1, $3); }
-| '(' type_name ')' additive_expression { $$ = expr_cast($4, last_type_name); }
+//| '(' type_name ')' additive_expression { $$ = expr_cast($4, last_type_name); }
 ;
 
 comparison_expression
@@ -229,7 +229,7 @@ declaration
 // %type ( declaration_list ) = < struct list * < struct symbol *>  >
 declaration_list
 : declaration  { $$ = $1; }
-| declaration_list declaration  { list_append_list($1, $2); $$ = $1; }
+| declaration_list declaration  { list_append_list($$ = $1, $2); }
 ;
 
 // *** declarator  (plusieurs declarator par declarations)
@@ -283,8 +283,8 @@ parameter_declaration
 
 // % type ( parameter_list ) = < struct list * < struct symbol * > >
 parameter_list
-: parameter_declaration {  $$ = list_new(0); list_append($$, $1); }
-| parameter_list ',' parameter_declaration {  $$ = $1; list_append($$, $3); }
+: parameter_declaration { list_append(($$ = list_new(0)), $1); }
+| parameter_list ',' parameter_declaration { list_append($$ = $1, $3); }
 ;
 
 /************* STATEMENTS  **************/
@@ -297,8 +297,8 @@ statement
 ;
 
 statement_list
-: statement  { $$ = list_new(0); list_append($$, $1);  }
-| statement_list statement { list_append($1, $2); }
+: statement  { list_append(($$ = list_new(0)), $1);  }
+| statement_list statement { list_append($$ = $1, $2); }
 ;
 
 left_brace

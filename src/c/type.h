@@ -13,7 +13,7 @@ struct list;
 #define  SIZE_ADDR    sizeof(void*)
 
 enum enum_type {
-    TYPE_UNDEF = 0,
+    TYPE_UNDEF = 10,
     TYPE_VOID,	// cannot be applied on a variable
     TYPE_GENERIC,	// generic is to allow to continue
     // parsing when an unresolved symbol is encountered
@@ -98,6 +98,8 @@ const struct expression *type_array_size(const struct type *ty);
 // basic types:
 extern const struct type *type_undef;
 extern const struct type *type_generic;
+extern const struct type *type_byte;
+extern const struct type *type_short;
 extern const struct type *type_int;
 extern const struct type *type_long;
 extern const struct type *type_float;

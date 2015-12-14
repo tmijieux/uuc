@@ -103,10 +103,8 @@ void fun_cg(struct function *fun)
 	     "%s"	// parameter init // all function init
 	     "%s"	// function body code
 	     "}\n",
-	     type_cg(type_function_return(fun->type)),
-	     funsymb->name,
-	     type_cg_arglist(type_function_argv(fun->type)),
-	     allocas,
+	     type_cg(type_function_return(fun->type)), funsymb->name,
+	     type_cg_arglist(type_function_argv(fun->type)), allocas,
 	     decl_init_list(type_function_argv(fun->type)), compnd->code);
     fun->code = funcode;
 
@@ -115,15 +113,16 @@ void fun_cg(struct function *fun)
 
 	
 	asprintf(&funcode, "define %s @%s.vectorize(%s) {\n"
-		 "start:\n" "%s"	// all function alloca
-		 "%s"			// parameter init // all function init
-		 "%s"			// function body code
+		 "start:\n"
+		 "%s"	// all function alloca
+		 "%s"	// parameter init // all function init
+		 "%s"	// function body code
 		 "}\n",
-		 type_cg(type_function_return(fun->type)),
-		 funsymb->name,
+		 type_cg(type_function_return(fun->type)), funsymb->name,
 		 type_cg_arglist(type_function_argv(fun->type)),
 		 allocas,
-		 decl_init_list(type_function_argv(fun->type)), compnd->code);
+		 decl_init_list(type_function_argv(fun->type)),
+		 compnd->code);
 	fun->vcode = funcode;
     }
 }
@@ -135,6 +134,11 @@ function_declare(struct symbol *declarator, struct list *param_list)
     st_set_parameters(param_list);
     declarator->symbol_type = SYM_FUNCTION;
 
+    for (int i = 1; i <= list_size(param_list); ++i) {
+	assert( ((struct symbol*)list_get(param_list,i))->variable.is_parameter);
+	symb_cg(list_get(param_list,i));
+    }
+    
     struct symbol *tmpsy;
     if ( !st_search(declarator->name, &tmpsy) ) {
 	// first declaration : add to the table

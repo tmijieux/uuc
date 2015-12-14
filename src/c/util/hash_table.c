@@ -4,7 +4,7 @@
 
 #include "hash_table.h"
 
-#define INITIAL_HASH_TABLE_SIZE	    13
+#define INITIAL_HASH_TABLE_SIZE	    113
 
 struct ht_entry {
     char *key;
@@ -78,7 +78,10 @@ struct hash_table *ht_create(size_t size, int (*hash) (const char *))
 	ht->hash = hash;
     else
 	ht->hash = &default_hash;
-    ht->size = size;
+    if (0 == size)
+	ht->size = INITIAL_HASH_TABLE_SIZE;
+    else
+	ht->size = size;
     ht->buf = calloc(sizeof(*ht->buf), ht->size);
     return ht;
 }

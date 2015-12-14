@@ -13,13 +13,36 @@
 #include "codegen.h"
 #include "expr_codegen.h"
 
+static const char *
+build_cmp_op(const struct type *t, const char *prefix)
+{
+    char *op;
+    if (type_float == t)
+	op = "cmp o";
+    else
+	op = "cmp s";
+    asprintf(&op, "%s%s", op, prefix);
+    return op;
+}
+
+static const char *
+build_eq_op(const struct type *t, const char *prefix)
+{
+    char *op;
+    if (type_float == t)
+	op = "cmp o";
+    else
+	op = "cmp ";
+    asprintf(&op, "%s%s", op, prefix);
+    return op;
+}
+
 inline void expr_cg(const struct expression *e)
 {
     if (error_count() > 0)
 	return;
     e->codegen((struct expression *) e);	// ON PURPOSE UNCONSTING
 }
-
 // -- helpers -- >>
 
 static char *new_register(void)
@@ -97,22 +120,23 @@ void expr_cg_xcrement(struct expression *e)
 
 #define expr_cg_xoperation_case(TYPE_, OPNAME_, PREFIX_)		\
     case EXPR_##TYPE_:							\
-    expr_cg_operation(e, OPNAME_, (e->type == type_float)?"f":PREFIX_);	\
+    expr_cg_operation(e, OPNAME_, (t == type_float)?"f":PREFIX_);	\
     break
 
 void expr_cg_xoperation(struct expression *e)
 {
+    const struct type *t = e->left_operand->type;
     switch (e->expression_type) {
 	expr_cg_xoperation_case(MULTIPLICATION, "mul", "");
 	expr_cg_xoperation_case(DIVISION, "div", "s");
 	expr_cg_xoperation_case(ADDITION, "add", "");
 	expr_cg_xoperation_case(SUBSTRACTION, "sub", "");
-	expr_cg_xoperation_case(LOWER, "cmp slt", "i");
-	expr_cg_xoperation_case(GREATER, "cmp slt", "i");
-	expr_cg_xoperation_case(LEQ, "cmp sle", "i");
-	expr_cg_xoperation_case(GEQ, "cmp sge", "i");
-	expr_cg_xoperation_case(NEQ, "cmp ne", "i");
-	expr_cg_xoperation_case(EQ, "cmp eq", "i");
+	expr_cg_xoperation_case(LOWER, build_cmp_op(t, "lt"), "i");
+	expr_cg_xoperation_case(GREATER, build_cmp_op(t, "gt"), "i");
+	expr_cg_xoperation_case(LEQ, build_cmp_op(t, "le"), "i");
+	expr_cg_xoperation_case(GEQ, build_cmp_op(t, "ge"), "i");
+	expr_cg_xoperation_case(NEQ, build_eq_op(t, "ne"), "i");
+	expr_cg_xoperation_case(EQ, build_eq_op(t, "eq"), "i");
 
     default:
 	internal_error("expr_cg_operation: default clause reached");
