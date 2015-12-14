@@ -133,11 +133,6 @@ function_declare(struct symbol *declarator, struct list *param_list)
     declarator->type = type_new_function_type(declarator->type, param_list);
     st_set_parameters(param_list);
     declarator->symbol_type = SYM_FUNCTION;
-
-    for (int i = 1; i <= list_size(param_list); ++i) {
-	assert( ((struct symbol*)list_get(param_list,i))->variable.is_parameter);
-	symb_cg(list_get(param_list,i));
-    }
     
     struct symbol *tmpsy;
     if ( !st_search(declarator->name, &tmpsy) ) {
@@ -149,7 +144,11 @@ function_declare(struct symbol *declarator, struct list *param_list)
 		  "not match previous declaration\n", declarator->name);
 	}
     }
-
+    
+    for (int i = 1; i <= list_size(param_list); ++i) {
+	assert( ((struct symbol*)list_get(param_list,i))->variable.is_parameter);
+    }
+    
     last_function_return_type = declarator->type->function_type.return_value;
     current_fun = module_get_or_create_function(m, declarator);
     return declarator;

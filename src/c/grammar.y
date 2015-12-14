@@ -160,7 +160,7 @@ additive_expression
 { $$ = expr_addition($1, $3); }
 | additive_expression '-' multiplicative_expression
 {  $$ = expr_substraction($1, $3); }
-//| '(' type_name ')' additive_expression { $$ = expr_cast($4, last_type_name); }
+| '(' type_name ')' additive_expression { $$ = expr_cast($4, last_type_name); }
 ;
 
 comparison_expression

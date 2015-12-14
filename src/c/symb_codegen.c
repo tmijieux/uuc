@@ -29,7 +29,7 @@ void symb_cg(struct symbol *sy)
 		 "store %s %%%s.%s, %s* %s\n",
 		 typestr, sy->name, "param",
 		 typestr, symbol_fully_qualified_name(sy));
-	printf("PARAMETER %s INITCODE//:%s\n", sy->name, init_code);
+//	printf("PARAMETER %s INITCODE//:%s\n", sy->name, init_code);
 	sy->variable.init_code = init_code;
     } else {  // symbol is a variable but not a parameter
 	if (type_is_array(sy->type) &&

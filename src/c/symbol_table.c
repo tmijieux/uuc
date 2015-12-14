@@ -132,6 +132,7 @@ void st_push(void)
 
     if (st->level == 1)	{ // if we just entered inside a function
 	int s = list_size(function_parameters);
+        fprintf(stderr, "function param length: %d\n", s);
 	for (int i = 1; i <= s; ++i) {
 	    // push the function parameters to the declared symbols
 	    
@@ -143,6 +144,7 @@ void st_push(void)
 
 	    if (!st_add(tmp))
 		error("symbol multiple definition: %s \n", tmp->name);
+            symb_cg(tmp);
 	}
 	function_parameters = list_new(0);	// ... and reset the list
     }

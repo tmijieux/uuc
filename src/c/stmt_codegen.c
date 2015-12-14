@@ -31,8 +31,7 @@ static const char *stmt_get_code(void *st)
 static const char *symb_get_init_code(void *st)
 {
     struct symbol *s = st;
-    assert (s->variable.is_parameter == true);
-    printf("INITCODE %s INITCODE\n", s->variable.init_code);
+//    printf("INITCODE %s INITCODE\n", s->variable.init_code);
     return s->variable.init_code;
 }
 
