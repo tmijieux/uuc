@@ -4,9 +4,8 @@
 #endif
 #include <stdio.h>
 #include <stdlib.h>
-
 #include <list.h>
-	
+    
 #include "type.h"
 #include "symbol.h"
 #include "symbol_table.h"
@@ -18,9 +17,9 @@
 #include "codegen.h"
 #include "module.h"
     
-extern int yylex();
-struct list *declarator_list_append(struct list *l, struct symbol *s);
-%}
+    extern int yylex();
+    struct list *declarator_list_append(struct list *l, struct symbol *s);
+    %}
 
 %token <str> TOKEN_IDENTIFIER
 %token <i> TOKEN_CONSTANTI
@@ -74,24 +73,24 @@ expression
     const struct expression *e = NULL;
     switch ($2) {
     case '=':
-	$$ = expr_assignment($1, $3);
-	break;
+        $$ = expr_assignment($1, $3);
+        break;
     case '-':
-	e = expr_substraction($1, $3);
-	$$ = expr_assignment($1, e);
-	break;
+        e = expr_substraction($1, $3);
+        $$ = expr_assignment($1, e);
+        break;
     case '+':
-	e = expr_addition($1, $3);
-	$$ = expr_assignment($1, e);
-	break;
+        e = expr_addition($1, $3);
+        $$ = expr_assignment($1, e);
+        break;
     case '*':
-	e = expr_multiplication($1, $3);
-	$$ = expr_assignment($1, e);
-	break;
-	
+        e = expr_multiplication($1, $3);
+        $$ = expr_assignment($1, e);
+        break;
+        
     default:
-	internal_error("default clause reached, assignment operator");
-	break;
+        internal_error("default clause reached, assignment operator");
+        break;
     }
  }
 | comparison_expression { $$ = $1; }
@@ -118,9 +117,9 @@ primary_expression
 | TOKEN_CONSTANTF { $$ = expr_constant(type_float, $1); }
 | '(' expression ')' { $$ = $2; }
 | TOKEN_MAP '(' postfix_expression ',' postfix_expression ')'
-  { $$ = expr_map($3, $5); }
+{ $$ = expr_map($3, $5); }
 | TOKEN_REDUCE '(' postfix_expression ',' postfix_expression ')'
-  { $$ = expr_reduce($3, $5); }
+{ $$ = expr_reduce($3, $5); }
 | TOKEN_IDENTIFIER '(' ')'  {   // funcall
     struct symbol *sy = symbol_check($1);
     $$ = expr_funcall(sy, list_new(0));
@@ -186,7 +185,7 @@ external_declaration
 | declaration {
     int si = list_size($1);
     for (int i = 1; i <= si; ++i)
-	module_add_global(m, list_get($1, i));
+        module_add_global(m, list_get($1, i));
  }
 | prototype { module_add_prototype(m, $1); }
 // %type < prototype > = < struct * symbol >
@@ -196,7 +195,7 @@ function_definition
 : type_name function_declarator compound_statement {
     struct function *fun = module_get_or_create_function(m, $2);
     if ( fun_set_body(fun, $3) != 0 ) {
-	fatal_error("multiple definition for function %s\n", $2->name);
+        fatal_error("multiple definition for function %s\n", $2->name);
     }
  }
 ;
@@ -216,12 +215,12 @@ type_name
 declaration
 : type_name declarator_list ';' {
     if ($1 == TYPE_VOID) 
-	error("void is not a valid type for a variable.\n");
+        error("void is not a valid type for a variable.\n");
     $$ = $2;
  }
 | TOKEN_EXTERN type_name declarator_list ';' {
     if ($2 == TYPE_VOID) 
-	error("void is not a valid type for a variable.\n");
+        error("void is not a valid type for a variable.\n");
     $$ = $3;
  }
 ;
@@ -240,7 +239,7 @@ declarator
 | declarator '[' TOKEN_CONSTANTI ']' {
     $$ = $1;
     $$->type = type_new_array_type_reversed($1->type,
-					    expr_constant(type_long, $3));
+                                            expr_constant(type_long, $3));
   }
 | declarator '[' TOKEN_IDENTIFIER ']' {
     struct symbol *sy = symbol_check($3);
@@ -251,7 +250,7 @@ declarator
 | declarator '[' ']' {
     $$ = $1;
     $$->type = type_new_array_type_reversed($1->type,
-					    expr_constant(type_long, 0L));
+                                            expr_constant(type_long, 0L));
   }
 ;
 
@@ -273,7 +272,7 @@ declarator_list
 parameter_declaration
 : type_name declarator {
     if ($1 == TYPE_VOID) 
-	error("void is not a valid type.\n");
+        error("void is not a valid type.\n");
     $$ = $2;
     $$->symbol_type = SYM_VARIABLE;
     $$->variable.is_parameter = 1;
@@ -331,22 +330,22 @@ expression_statement
 ;
 
 selection_statement
-: TOKEN_IF '(' expression ')' statement {  $$ = stmt_if($3, $5); }
+: TOKEN_IF '(' expression ')' statement { $$ = stmt_if($3, $5); }
 | TOKEN_IF '(' expression ')' statement TOKEN_ELSE statement
- { $$ = stmt_if_else($3, $5, $7);  }
+{ $$ = stmt_if_else($3, $5, $7); }
 | TOKEN_FOR '(' expression_statement expression_statement expression ')' statement
- { $$ = stmt_for($3->expr, $4->expr, $5, $7); }
+{ $$ = stmt_for($3->expr, $4->expr, $5, $7); }
 ;
 
 iteration_statement
-: TOKEN_WHILE '(' expression ')' statement {  $$ = stmt_while($3, $5); }
+: TOKEN_WHILE '(' expression ')' statement { $$ = stmt_while($3, $5); }
 | TOKEN_DO statement TOKEN_WHILE '(' expression ')' ';'
 { $$ = stmt_do_while($5, $2); }
 ;
 
 jump_statement
-: TOKEN_RETURN ';' {  $$ = stmt_return_void(); }
-| TOKEN_RETURN expression ';' {   $$ = stmt_return($2); }
+: TOKEN_RETURN ';' { $$ = stmt_return_void(); }
+| TOKEN_RETURN expression ';' { $$ = stmt_return($2); }
 ;
 /************************************************/
 
@@ -357,7 +356,7 @@ struct list *declarator_list_append(struct list *l, struct symbol *s)
     list_append(l, s);
     s->symbol_type = SYM_VARIABLE;
     if (!st_add(s)) {
-	error("symbol multiple definition: %s \n", s->name);
+        error("symbol multiple definition: %s \n", s->name);
     }
     return l;
 }
