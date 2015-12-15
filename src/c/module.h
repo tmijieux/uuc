@@ -15,6 +15,6 @@ module_get_or_create_function(struct module *m, struct symbol *sym);
 void module_print(struct module *m, FILE * out);
 
 void module_add_prototype(struct module *m, struct symbol *sym);
-void module_add_global(struct module *m, struct symbol *sym);
+void module_add_global(struct module *m, struct symbol *sym, bool extern_);
 
 #endif	//MODULE_H

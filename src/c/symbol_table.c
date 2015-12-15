@@ -36,11 +36,12 @@ static void check_variable_use(const struct hash_table *);
 
 void st_set_parameters(struct list *l)
 {
-    if (st->level == 0)	{ // this has no meaning inside a function
-	function_parameters = l;
-    } else {
-	internal_error("st_set_parameter was called inside a block\n");
-    }
+    function_parameters = l;
+    /* if (st->level == 0)	{ // this has no meaning inside a function */
+    /*     function_parameters = l; */
+    /* } else { */
+    /*     internal_error("st_set_parameter was called inside a block\n"); */
+    /* } */
 }
 
 /**
@@ -120,7 +121,8 @@ void st_pop(void)
 
 /**
  * push a symbol_table to the symbol table's stack
- * this is used to create a new scope for  local variables in a compound statement
+ * this is used to create a new scope for  local variables in a
+ * compound statement
  */
 void st_push(void)
 {
@@ -132,13 +134,11 @@ void st_push(void)
 
     if (st->level == 1)	{ // if we just entered inside a function
 	int s = list_size(function_parameters);
-        fprintf(stderr, "function param length: %d\n", s);
 	for (int i = 1; i <= s; ++i) {
 	    // push the function parameters to the declared symbols
-	    
 	    struct symbol *tmp = list_get(function_parameters, i);
-	    
-	    if (s == 1) {// OOOHHHH We may want to vectorize this function!!!!!
+	    if (s == 1) {
+                // OOOHHHH We may want to vectorize this function!!!!!
 		// symbol_prepare_vectorization(tmp);
 	    }
 

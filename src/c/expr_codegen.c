@@ -303,14 +303,15 @@ void expr_cg_symbol(struct expression *e)
 void expr_cg_constant(struct expression *e)
 {
     e->vreg = new_register();
-    if (e->type == type_int)
+    if (e->type == type_int) {
 	asprintf(&e->vcode, "%s = add i32 %d, 0\n", e->vreg, e->constanti);
-    else if (e->type == type_float) {
+    } else if (e->type == type_float) {
 	double tmp = (double) e->constantf;
 	asprintf(&e->vcode, "%s = fadd float %#018lx, 0.\n",
 		 e->vreg, *(uint64_t *) (&tmp));
-    } else if (e->type == type_long)
+    } else if (e->type == type_long) {
 	asprintf(&e->vcode, "%s = add i64 %ld, 0\n", e->vreg, e->constantl);
+    }
 }
 
 void expr_cg_funcall(struct expression *e)

@@ -102,7 +102,7 @@ void module_add_prototype(struct module *m, struct symbol *sym)
     list_append(m->protolist, pt);
 }
 
-void module_add_global(struct module *m, struct symbol *sym)
+void module_add_global(struct module *m, struct symbol *sym, bool extern_)
 {
     assert(sym->type->type != TYPE_FUNCTION);
     assert(sym->type->type != TYPE_VOID);
@@ -112,8 +112,11 @@ void module_add_global(struct module *m, struct symbol *sym)
     sym->variable.is_global = 1;
 
     char *code;
-    asprintf(&code, "%s = global %s 0\n",
-	     symbol_fully_qualified_name(sym), type_cg(sym->type));
+    asprintf(&code, "%s =%s global %s %s\n",
+	     symbol_fully_qualified_name(sym),
+             extern_ ? " external" : "",
+             type_cg(sym->type),
+             extern_ ? "" : "0");
 
     list_append(m->globlist, code);
 

@@ -185,9 +185,14 @@ external_declaration
 | declaration {
     int si = list_size($1);
     for (int i = 1; i <= si; ++i)
-        module_add_global(m, list_get($1, i));
+        module_add_global(m, list_get($1, i), false);
  }
 | prototype { module_add_prototype(m, $1); }
+| TOKEN_EXTERN declaration {
+    int si = list_size($2);
+    for (int i = 1; i <= si; ++i)
+        module_add_global(m, list_get($2, i), true);
+ }
 // %type < prototype > = < struct * symbol >
 ;
 
@@ -197,6 +202,7 @@ function_definition
     if ( fun_set_body(fun, $3) != 0 ) {
         fatal_error("multiple definition for function %s\n", $2->name);
     }
+    $$ = fun;
  }
 ;
 
@@ -218,11 +224,9 @@ declaration
         error("void is not a valid type for a variable.\n");
     $$ = $2;
  }
-| TOKEN_EXTERN type_name declarator_list ';' {
-    if ($2 == TYPE_VOID) 
-        error("void is not a valid type for a variable.\n");
-    $$ = $3;
- }
+| function_definition {
+    struct symbol *s = $1->name_s;
+    $$ = list_new(LI_ELEM, s, NULL); }
 ;
 
 // %type ( declaration_list ) = < struct list * < struct symbol *>  >
