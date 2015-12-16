@@ -61,6 +61,7 @@ struct expression {
 	int constanti;
 	float constantf;
 	long constantl;
+        char *constantstr;
 	struct symbol *symbol;
 	const struct type *target_type;
     };

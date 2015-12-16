@@ -72,6 +72,14 @@ void internal_error(const char *format, ...)
     fatal_error__(ERR_OTHER, format, ap);
 }
 
+
+void debugi(const char *format, ...)
+{
+    va_list ap;
+    va_start(ap, format);
+    vfprintf(stderr, format, ap);
+}
+
 extern const char *old_yytext[];
 extern unsigned int old_yytext_index;
 

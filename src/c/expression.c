@@ -11,6 +11,7 @@
 #include "error.h"
 #include "color.h"
 #include "expr_codegen.h"
+#include "string_literal.h"
 
 static struct expression *expr_new(enum expression_type ext)
 {
@@ -87,14 +88,14 @@ const struct expression *expr_constant(const struct type *ty, ...)
 
     if (expr->type == type_int) {
 	expr->constanti = va_arg(ap, int);
-        debug("const int\n");
     } else if (expr->type == type_float) {
 	expr->constantf = (float) va_arg(ap, double);
-        debug("const float\n");
 	// there can't be a float in va_arg
     } else if (expr->type == type_long) {
 	expr->constantl = va_arg(ap, long);
-        debug("const long\n");
+    } else if (expr->type == type_string) {
+        expr->constantstr = va_arg(ap, char*);
+        string_get_or_create_literal(expr->constantstr);
     } else {
 	debug("%s\n", type_printable(ty));
 	internal_error("unexpected parse error %s:%d\n", __FILE__, __LINE__);

@@ -19,6 +19,7 @@ SRC=	grammar.c \
 	stmt_codegen.c \
 	symb_codegen.c \
 	type_codegen.c \
+	string_literal.c \
 	libutil.a \
 
 ifndef NOGC

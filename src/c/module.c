@@ -8,6 +8,7 @@
 #include "symbol.h"
 #include "hash_table.h"
 #include "codegen.h"
+#include "string_literal.h"
 
 struct module {
     struct hash_table *funtable;
@@ -74,6 +75,15 @@ void module_print(struct module *m, FILE * out)
 	ht_get_entry(m->funtable, pt->name, &f);
 	if (!f->body_set)
 	    fputs(pt->code, out);
+    }
+
+    fputs("\n;literals\n", out);
+    struct list *literals = string_get_literals_list();
+    si = list_size(literals);
+    for (int i = 1; i <= si; ++i) {
+        struct literal *lit = list_get(literals, i);
+        fprintf(out, "%s = private unnamed_addr constant [%zu x i8] c\"%s\\00\"",
+                lit->reg, lit->length, lit->value);
     }
     
     fputs("\n", out);

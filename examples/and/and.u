@@ -15,6 +15,7 @@ int true()
 int main()
 {
     string a;
+    a = "lel";
     
     if ( true()  && false() )
     {

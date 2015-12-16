@@ -12,6 +12,7 @@
 #include "program.h"
 #include "codegen.h"
 #include "expr_codegen.h"
+#include "string_literal.h"
 
 static const char *
 build_cmp_op(const struct type *t, const char *prefix)
@@ -314,6 +315,12 @@ void expr_cg_constant(struct expression *e)
 		 e->vreg, *(uint64_t *) (&tmp));
     } else if (e->type == type_long) {
 	asprintf(&e->vcode, "%s = add i64 %ld, 0\n", e->vreg, e->constantl);
+    } else if (e->type == type_string) {
+        struct literal *lit = string_get_or_create_literal(e->constantstr);
+        asprintf(&e->vcode, "%s = bitcast [%zu x i8]* %s to i8*\n", e->vreg,
+                 lit->length, lit->reg);
+    } else {
+        internal_error("%s: %d", __FILE__, __LINE__);
     }
 }
 
