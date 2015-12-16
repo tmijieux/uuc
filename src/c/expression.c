@@ -87,18 +87,20 @@ const struct expression *expr_constant(const struct type *ty, ...)
 
     if (expr->type == type_int) {
 	expr->constanti = va_arg(ap, int);
+        debug("const int\n");
     } else if (expr->type == type_float) {
 	expr->constantf = (float) va_arg(ap, double);
+        debug("const float\n");
 	// there can't be a float in va_arg
     } else if (expr->type == type_long) {
 	expr->constantl = va_arg(ap, long);
+        debug("const long\n");
     } else {
-	printf("%s\n", type_printable(ty));
-	fatal_error("unexpected parse error %s:%d\n", __FILE__, __LINE__);
+	debug("%s\n", type_printable(ty));
+	internal_error("unexpected parse error %s:%d\n", __FILE__, __LINE__);
     }
 
     va_end(ap);
-
     expr->codegen = &expr_cg_constant;
     return expr;
 }
@@ -371,8 +373,6 @@ static const struct expression *operation(enum expression_type et,
     if (expr_is_test(rop))
 	rop = expr->right_operand = expr_zero_extend(rop, type_int);
 
-
-
     if (!type_equal(lop->type, rop->type)) {
 	cast_to_greatest_precision(expr);
 	lop = expr->left_operand;
@@ -443,10 +443,41 @@ const struct expression *expr_multiplication(const struct expression *lop,
     return operation(EXPR_MULTIPLICATION, "multiplication", lop, rop);
 }
 
+const struct expression *expr_modulo(const struct expression *lop,
+                                     const struct expression *rop)
+{
+    if (!(type_is_integer(lop->type) && type_is_integer(rop->type))) {
+        error("modulo require both operands to be og integer type\n");
+        struct expression *expr = expr_new(EXPR_MODULO);
+        expr->type = type_generic;
+        return expr;
+    }
+
+    return operation(EXPR_MODULO, "mod", lop, rop);
+}
+
 const struct expression *expr_division(const struct expression *lop,
 				       const struct expression *rop)
 {
     return operation(EXPR_DIVISION, "division", lop, rop);
+}
+
+const struct expression *expr_and(const struct expression *lop,
+                                  const struct expression *rop)
+{
+    const struct expression *zero = expr_constant(type_int, 0);
+    return operation(EXPR_AND, "and",
+                     operation(EXPR_NEQ, "zero test", lop, zero),
+                     operation(EXPR_NEQ, "zero test", rop, zero));
+}
+
+const struct expression *expr_or(const struct expression *lop,
+                                  const struct expression *rop)
+{
+    const struct expression *zero = expr_constant(type_int, 0);
+    return operation(EXPR_OR, "or",
+                     operation(EXPR_NEQ, "zero test", lop, zero),
+                     operation(EXPR_NEQ, "zero test", rop, zero));
 }
 
 const struct expression *expr_assignment(const struct expression *lop,
@@ -575,5 +606,27 @@ const struct expression *expr_array_size(const struct expression *array)
     expr->type = type_long;
     expr->array = array;
     expr->codegen = &expr_cg_array_size;
+    return expr;
+}
+
+const struct expression *expr_unary(char c, const struct expression *e)
+{
+    switch (c) {
+    case '-':
+        return expr_unary_minus(e);
+        break;
+        
+    default:
+        internal_error("unary operator '%c' not implemented", c);
+        break;
+    }
+
+    return expr_generic();
+}
+
+const struct expression *expr_generic(void)
+{
+    struct expression *expr = expr_new(EXPR_GENERIC);
+    expr->type = type_generic;
     return expr;
 }

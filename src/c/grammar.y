@@ -21,13 +21,13 @@
     struct list *declarator_list_append(struct list *l, struct symbol *s);
     %}
 
-%token <str> TOKEN_IDENTIFIER
+%token <str> TOKEN_IDENTIFIER TOKEN_STRING_LITERAL
 %token <i> TOKEN_CONSTANTI
 %token <f> TOKEN_CONSTANTF
-%token TOKEN_MAP TOKEN_REDUCE TOKEN_EXTERN TOKEN_SIZE_OP
+%token TOKEN_MAP TOKEN_REDUCE TOKEN_EXTERN TOKEN_SIZE_OP 
 %token TOKEN_INC_OP TOKEN_DEC_OP TOKEN_LE_OP TOKEN_GE_OP TOKEN_EQ_OP TOKEN_NE_OP
 %token TOKEN_SUB_ASSIGN TOKEN_MUL_ASSIGN TOKEN_ADD_ASSIGN
-%token TOKEN_INT TOKEN_FLOAT TOKEN_VOID
+%token TOKEN_INT TOKEN_FLOAT TOKEN_VOID TOKEN_AND_OP TOKEN_OR_OP TOKEN_STRING
 %token TOKEN_IF TOKEN_ELSE TOKEN_WHILE TOKEN_RETURN TOKEN_FOR TOKEN_DO
 
 %type <enum_type> type_name
@@ -38,12 +38,14 @@
 %type <list> declarator_list declaration_list parameter_list declaration
 %type <list> argument_expression_list statement_list
 
-%type <expr> expression unary_expression comparison_expression primary_expression
+%type <expr> expression unary_expression primary_expression
 %type <expr> postfix_expression multiplicative_expression additive_expression
+%type <expr> cast_expression relational_expression equality_expression
+%type <expr> logical_and_expression logical_or_expression
 
 %type <stmt> statement expression_statement compound_statement 
 %type <stmt> selection_statement iteration_statement jump_statement
-%type <c> assignment_operator
+%type <c> assignment_operator unary_operator
 
 %start program
 %union {
@@ -63,13 +65,113 @@
     struct list *list;
 };
 %%
- /***************** EXPRESSION ******************/
+/***************** EXPRESSION ******************/
 
- // expression > comparison > additive >
- //    multiplicative > unary > postfix > primary
+// expression > comparison > additive >
+//    multiplicative > unary > postfix > primary
+primary_expression
+: TOKEN_IDENTIFIER  {
+    struct symbol *sy = symbol_check($1);
+    $$ = expr_symbol(sy);
+ }
+| TOKEN_CONSTANTI { $$ = expr_constant(type_int, $1); }
+| TOKEN_CONSTANTF { $$ = expr_constant(type_float, $1); }
+| TOKEN_STRING_LITERAL { $$ = expr_constant(type_string, $1); }
+| '(' expression ')' { $$ = $2; }
+| TOKEN_MAP '(' postfix_expression ',' postfix_expression ')'
+{ $$ = expr_map($3, $5); }
+| TOKEN_REDUCE '(' postfix_expression ',' postfix_expression ')'
+{ $$ = expr_reduce($3, $5); }
+| TOKEN_IDENTIFIER '(' ')'  {   // funcall
+    struct symbol *sy = symbol_check($1);
+    $$ = expr_funcall(sy, list_new(0));
+  }
+| TOKEN_IDENTIFIER '(' argument_expression_list ')' { // funcall with parameter
+    struct symbol *sy = symbol_check($1);
+    $$ = expr_funcall(sy, $3);
+  }
+| TOKEN_SIZE_OP '(' postfix_expression  ')' { $$ = expr_array_size($3);}
+;
 
-expression                   
-: unary_expression assignment_operator expression {
+postfix_expression
+: primary_expression                    { $$ = $1; }
+| postfix_expression '[' expression ']' { $$ = expr_postfix($1, $3); }
+;
+
+argument_expression_list
+: expression  { list_append(($$ = list_new(0)), $1); }
+| argument_expression_list ',' expression { list_append($$ = $1, $3); }
+;
+
+unary_expression
+: postfix_expression                 { $$ = $1; }
+| TOKEN_INC_OP postfix_expression    { $$ = expr_pre_inc($2); }
+| TOKEN_DEC_OP postfix_expression    { $$ = expr_pre_dec($2); }
+| postfix_expression TOKEN_INC_OP    { $$ = expr_post_inc($1); }
+| postfix_expression TOKEN_DEC_OP    { $$ = expr_post_dec($1); }
+| unary_operator cast_expression     { $$ = expr_unary($1, $2); }
+;
+
+unary_operator
+: '-' { $$ = '-'; }
+| '~' { $$ = '~'; }
+| '!' { $$ = '!'; }
+;
+
+cast_expression
+: unary_expression
+| '(' type_name ')' cast_expression { $$ = expr_cast($4, last_type_name); }
+;
+
+multiplicative_expression
+: cast_expression               { $$ = $1; }
+| multiplicative_expression '*' cast_expression
+{ $$ = expr_multiplication($1, $3); }
+| multiplicative_expression '/' cast_expression
+{ $$ = expr_division($1, $3); }
+| multiplicative_expression '%' cast_expression
+{ $$ = expr_modulo($1, $3); }
+;
+
+additive_expression
+: multiplicative_expression             { $$ = $1; }
+| additive_expression '+' multiplicative_expression
+{ $$ = expr_addition($1, $3); }
+| additive_expression '-' multiplicative_expression
+{  $$ = expr_substraction($1, $3); }
+;
+
+relational_expression
+: additive_expression              { $$ = $1; }
+| relational_expression '<' additive_expression { $$ = expr_lower($1, $3);  }
+| relational_expression '>' additive_expression { $$ = expr_greater($1, $3); }
+| relational_expression TOKEN_LE_OP additive_expression { $$ = expr_leq($1, $3); }
+| relational_expression TOKEN_GE_OP additive_expression { $$ = expr_geq($1, $3); }
+;
+
+equality_expression
+: relational_expression              { $$ = $1; }
+| equality_expression TOKEN_EQ_OP relational_expression { $$ = expr_eq($1, $3); }
+| equality_expression TOKEN_NE_OP relational_expression { $$ = expr_neq($1, $3); }
+;
+
+logical_and_expression
+: equality_expression { $$ = $1; }
+| logical_and_expression TOKEN_AND_OP equality_expression
+ { $$ = expr_and($1, $3); }
+;
+;
+
+logical_or_expression
+: logical_and_expression { $$ = $1; }
+| logical_or_expression TOKEN_OR_OP logical_and_expression
+{ $$ = expr_or($1, $3); }
+;
+;
+
+expression
+: logical_or_expression { $$ = $1; }
+| unary_expression assignment_operator expression {
     const struct expression *e = NULL;
     switch ($2) {
     case '=':
@@ -93,12 +195,6 @@ expression
         break;
     }
  }
-| comparison_expression { $$ = $1; }
-;
-
-argument_expression_list
-: expression  { list_append(($$ = list_new(0)), $1); }
-| argument_expression_list ',' expression { list_append($$ = $1, $3); }
 ;
 
 assignment_operator // type : char
@@ -106,70 +202,6 @@ assignment_operator // type : char
 | TOKEN_MUL_ASSIGN   { $$ = '*'; }
 | TOKEN_ADD_ASSIGN   { $$ = '+'; }
 | TOKEN_SUB_ASSIGN   { $$ = '-'; }
-;
-
-primary_expression
-: TOKEN_IDENTIFIER  {
-    struct symbol *sy = symbol_check($1);
-    $$ = expr_symbol(sy);
- }
-| TOKEN_CONSTANTI { $$ = expr_constant(type_int, $1); }
-| TOKEN_CONSTANTF { $$ = expr_constant(type_float, $1); }
-| '(' expression ')' { $$ = $2; }
-| TOKEN_MAP '(' postfix_expression ',' postfix_expression ')'
-{ $$ = expr_map($3, $5); }
-| TOKEN_REDUCE '(' postfix_expression ',' postfix_expression ')'
-{ $$ = expr_reduce($3, $5); }
-| TOKEN_IDENTIFIER '(' ')'  {   // funcall
-    struct symbol *sy = symbol_check($1);
-    $$ = expr_funcall(sy, list_new(0));
-  }
-| TOKEN_IDENTIFIER '(' argument_expression_list ')' { // funcall with parameter
-    struct symbol *sy = symbol_check($1);
-    $$ = expr_funcall(sy, $3);
-  }
-| TOKEN_SIZE_OP '(' postfix_expression  ')' { $$ = expr_array_size($3);}
-;
-
-postfix_expression
-: primary_expression                    { $$ = $1; }
-| postfix_expression '[' expression ']' { $$ = expr_postfix($1, $3); }
-;
-
-unary_expression
-: postfix_expression                 { $$ = $1; }
-| TOKEN_INC_OP postfix_expression    { $$ = expr_pre_inc($2); }
-| TOKEN_DEC_OP postfix_expression    { $$ = expr_pre_dec($2); }
-| postfix_expression TOKEN_INC_OP    { $$ = expr_post_inc($1); }
-| postfix_expression TOKEN_DEC_OP    { $$ = expr_post_dec($1); }
-| '-'  unary_expression              { $$ = expr_unary_minus($2); }
-;
-
-multiplicative_expression
-: unary_expression               { $$ = $1; }
-| multiplicative_expression '*' unary_expression
-{ $$ = expr_multiplication($1, $3); }
-| multiplicative_expression '/' unary_expression
-{ $$ = expr_division($1, $3); }
-;
-
-additive_expression
-: multiplicative_expression             { $$ = $1; }
-| additive_expression '+' multiplicative_expression
-{ $$ = expr_addition($1, $3); }
-| additive_expression '-' multiplicative_expression
-{  $$ = expr_substraction($1, $3); }
-| '(' type_name ')' additive_expression { $$ = expr_cast($4, last_type_name); }
-;
-
-comparison_expression
-: additive_expression              { $$ = $1; }
-| additive_expression '<' additive_expression { $$ = expr_lower($1, $3);  }
-| additive_expression '>' additive_expression { $$ = expr_greater($1, $3); }
-| additive_expression TOKEN_LE_OP additive_expression { $$ = expr_leq($1, $3); }
-| additive_expression TOKEN_GE_OP additive_expression { $$ = expr_geq($1, $3); }
-| additive_expression TOKEN_EQ_OP additive_expression { $$ = expr_eq($1, $3); }
-| additive_expression TOKEN_NE_OP additive_expression { $$ = expr_neq($1, $3); }
 ;
 
 // ************ DECLARATIONS *****************/
@@ -215,6 +247,7 @@ type_name
 : TOKEN_VOID   { $$ = TYPE_VOID; last_type_name = type_void; }
 | TOKEN_INT    { $$ = TYPE_INT;  last_type_name = type_int; }
 | TOKEN_FLOAT  { $$ = TYPE_FLOAT; last_type_name = type_float; }
+| TOKEN_STRING  { $$ = TYPE_STRING; last_type_name = type_string; }
 ;
 
 // %type ( declaration ) = < struct list * < struct symbol *>  >
@@ -224,11 +257,7 @@ declaration
         error("void is not a valid type for a variable.\n");
     $$ = $2;
  }
-| function_definition {
-    struct symbol *s = $1->name_s;
-    $$ = list_new(LI_ELEM, s, NULL); }
 ;
-
 // %type ( declaration_list ) = < struct list * < struct symbol *>  >
 declaration_list
 : declaration  { $$ = $1; }

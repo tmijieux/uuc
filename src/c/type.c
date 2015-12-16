@@ -21,6 +21,7 @@ static struct type *type_new(enum enum_type t);
 
 DEFINE_TYPE(undef);
 DEFINE_TYPE(generic);
+DEFINE_TYPE(string);
 
 DEFINE_TYPE(bool);
 DEFINE_TYPE(byte);
@@ -37,6 +38,7 @@ static int type_precision__[] = {
     [TYPE_VOID] = -1,
     [TYPE_ARRAY] = -1,
     [TYPE_FUNCTION] = -1,
+    [TYPE_STRING] = -1,
 
     [TYPE_BOOL] = 5,
     [TYPE_BYTE] = 10,
@@ -79,6 +81,7 @@ static void type_init(void)
 {
     INIT_TYPE(undef, UNDEF);
     INIT_TYPE(generic, GENERIC);
+    INIT_TYPE(string, STRING);
 
     INIT_TYPE(bool, BOOL);
     INIT_TYPE(byte, BYTE);
@@ -199,19 +202,15 @@ const char *type_printable(const struct type *t)
     case TYPE_GENERIC:
 	printable = "generic";
 	break;
-
     case TYPE_VOID:
 	printable = "void";
 	break;
-
     case TYPE_BOOL:
 	printable = "bool";
 	break;
-
     case TYPE_INT:
 	printable = "int";
 	break;
-
     case TYPE_FLOAT:
 	printable = "float";
 	break;

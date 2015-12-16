@@ -1,0 +1,25 @@
+
+void putint(int a);
+int puts(string s);
+
+int false()
+{
+    return 0;
+}
+
+int true()
+{
+    return 1;	
+}
+
+int main()
+{
+    string a;
+    
+    if ( true()  && false() )
+    {
+        puts(a);
+    }
+	
+    return 0;
+}

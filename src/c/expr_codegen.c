@@ -129,8 +129,11 @@ void expr_cg_xoperation(struct expression *e)
     switch (e->expression_type) {
 	expr_cg_xoperation_case(MULTIPLICATION, "mul", "");
 	expr_cg_xoperation_case(DIVISION, "div", "s");
+        expr_cg_xoperation_case(MODULO, "rem", "s");
 	expr_cg_xoperation_case(ADDITION, "add", "");
 	expr_cg_xoperation_case(SUBSTRACTION, "sub", "");
+        expr_cg_xoperation_case(AND, "and", "");
+        expr_cg_xoperation_case(OR, "or", "");
 	expr_cg_xoperation_case(LOWER, build_cmp_op(t, "lt"), "i");
 	expr_cg_xoperation_case(GREATER, build_cmp_op(t, "gt"), "i");
 	expr_cg_xoperation_case(LEQ, build_cmp_op(t, "le"), "i");

@@ -17,6 +17,7 @@ enum expression_type {
     EXPR_POSTFIX,	// a[i]
     EXPR_ARRAY_SIZE,
     EXPR_MULTIPLICATION,
+    EXPR_MODULO,
     EXPR_DIVISION,
     EXPR_ADDITION,
     EXPR_SUBSTRACTION,
@@ -26,6 +27,8 @@ enum expression_type {
     EXPR_GEQ,
     EXPR_EQ,
     EXPR_NEQ,
+    EXPR_AND,
+    EXPR_OR,
     EXPR_ASSIGNMENT,
     EXPR_MAP,
     EXPR_REDUCE,
@@ -36,7 +39,8 @@ enum expression_type {
     EXPR_SIGN_EXTEND,
     EXPR_ZERO_EXTEND,
     EXPR_TRUNC,
-    EXPR_UNDEF
+    EXPR_UNDEF,
+    EXPR_GENERIC
 };
 
 struct expression {
@@ -90,11 +94,13 @@ const struct expression *expr_postfix(const struct expression *array,
 				      const struct expression *index);
 
 // Unary ops
+const struct expression *expr_unary(char c, const struct expression *e);
 const struct expression *expr_unary_minus(const struct expression *op);
 const struct expression *expr_post_dec(const struct expression *op);
 const struct expression *expr_pre_dec(const struct expression *op);
 const struct expression *expr_post_inc(const struct expression *op);
 const struct expression *expr_pre_inc(const struct expression *op);
+const struct expression *expr_generic(void);
 
 // Comparisons
 const struct expression *expr_neq(const struct expression *lop,
@@ -120,7 +126,12 @@ const struct expression *expr_multiplication(const struct expression *lop,
 					     const struct expression *rop);
 const struct expression *expr_division(const struct expression *lop,
 				       const struct expression *rop);
-
+const struct expression *expr_modulo(const struct expression *lop,
+                                     const struct expression *rop);
+const struct expression *expr_and(const struct expression *lop,
+                                  const struct expression *rop);
+const struct expression *expr_or(const struct expression *lop,
+                                 const struct expression *rop);
 const struct expression *expr_assignment(const struct expression *lop,
 					 const struct expression *rop);
 
@@ -136,7 +147,7 @@ const struct expression *expr_zero_extend(const struct expression *op,
 					  const struct type *target);
 const struct expression *expr_trunc(const struct expression *op,
 				    const struct type *target);
-
 const struct expression *expr_array_size(const struct expression *array);
+
 
 #endif	//EXPRESSION_H

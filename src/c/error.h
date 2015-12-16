@@ -5,6 +5,11 @@
 #define ERROR_OUTPUT stderr
 #endif
 
+
+#define debug(,  ...)                    \
+    __VA_ARGS__
+
+
 void warning(const char *format, ...);
 void error(const char *format, ...);
 void fatal_error(const char *format, ...);

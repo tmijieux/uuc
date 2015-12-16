@@ -45,6 +45,7 @@ const char *type_cg(const struct type *t)
     case TYPE_VOID:
         lt = "void";
         break;
+    case TYPE_STRING:
     case TYPE_GENERIC:
         lt = "i8*";
         break;

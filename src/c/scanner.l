@@ -23,6 +23,7 @@ L[a-zA-Z_]
 "if"		{ count(); return(TOKEN_IF); }
 "else"		{ count(); return(TOKEN_ELSE); }
 "int"		{ count(); return(TOKEN_INT); }
+"string"        { count(); return(TOKEN_STRING); }
 "return"	{ count(); return(TOKEN_RETURN); }
 "void"		{ count(); return(TOKEN_VOID); }
 "while"		{ count(); return(TOKEN_WHILE); }
@@ -36,6 +37,8 @@ L[a-zA-Z_]
                             return(TOKEN_IDENTIFIER); }
 {D}+    	{ count(); yylval.i=atoi(yytext); return(TOKEN_CONSTANTI); }
 {D}+"."{D}*     { count(); yylval.f=atof(yytext); return(TOKEN_CONSTANTF); }
+L?\"(\\.|[^\\"])*\"	{ count(); yylval.str=strdup(yytext);
+                          return(TOKEN_STRING_LITERAL); }
 "+="		{ count(); return(TOKEN_ADD_ASSIGN); }
 "-="		{ count(); return(TOKEN_SUB_ASSIGN); }
 "*="		{ count(); return(TOKEN_MUL_ASSIGN); }
@@ -45,6 +48,8 @@ L[a-zA-Z_]
 ">="		{ count(); return(TOKEN_GE_OP); }
 "=="		{ count(); return(TOKEN_EQ_OP); }
 "!="		{ count(); return(TOKEN_NE_OP); }
+"||"		{ count(); return(TOKEN_OR_OP); }
+"&&"		{ count(); return(TOKEN_AND_OP); }
 ";"		{ count(); return(';'); }
 "{"      	{ count(); return('{'); }
 "}"      	{ count(); return('}'); }
@@ -57,9 +62,11 @@ L[a-zA-Z_]
 "]"     	{ count(); return(']'); }
 "."		{ count(); return('.'); }
 "!"		{ count(); return('!'); }
+"~"		{ count(); return('~'); }
 "-"		{ count(); return('-'); }
 "+"		{ count(); return('+'); }
 "*"		{ count(); return('*'); }
+"%"		{ count(); return('%'); }
 "<"		{ count(); return('<'); }
 ">"		{ count(); return('>'); }
 [ \t\v\n\f]	{ count(); }

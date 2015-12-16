@@ -19,6 +19,7 @@ enum enum_type {
     // parsing when an unresolved symbol is encountered
     // should be type_unresolved maybe and make type_unresolved
     // inaccessible from the langage
+    TYPE_STRING,
 
     TYPE_BOOL,
     TYPE_BYTE,
@@ -105,6 +106,7 @@ extern const struct type *type_long;
 extern const struct type *type_float;
 extern const struct type *type_void;
 extern const struct type *type_bool;
+extern const struct type *type_string;
 
 /**
  *  This variable is used to remember the last type_name that was read
