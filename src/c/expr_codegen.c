@@ -398,13 +398,16 @@ void expr_cg_assignment(struct expression *e)
 
 void expr_cg_fpsicast(struct expression *e)
 {
-    char *cast_instr = "unimplemented cast";
+    char *cast_instr = "unimplemented";
 
     if (e->operand->type == type_float && type_is_integer(e->target_type)) {
 	cast_instr = "fptosi";
     } else if (type_is_integer(e->operand->type)
 	       && e->target_type == type_float) {
 	cast_instr = "sitofp";
+    }  else if (type_string == e->operand->type 
+                && e->target_type == type_int) {
+	cast_instr = "ptrtoint";
     }
 
     expr_cg(e->operand);

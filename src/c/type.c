@@ -193,7 +193,7 @@ static const char *str_expression_size(const struct expression *expr)
 
 const char *type_printable(const struct type *t)
 {
-    char *printable = "";
+    char *printable = "type_printable_unimplemented";
 
     switch (t->type) {
     case TYPE_UNDEF:
@@ -217,7 +217,9 @@ const char *type_printable(const struct type *t)
     case TYPE_LONG:
 	printable = "long";
 	break;
-
+    case TYPE_STRING:
+	printable = "string";
+	break;
     case TYPE_ARRAY:
 	asprintf(&printable, "array<%s%s>",
 		 str_expression_size(t->array_type.array_size),
@@ -229,9 +231,7 @@ const char *type_printable(const struct type *t)
 		 type_arglist(t->function_type.argv),
 		 type_printable(t->function_type.return_value));
 	break;
-
     default:
-	printable = "";
 	break;
     }
 

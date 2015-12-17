@@ -1,0 +1,16 @@
+
+int puts(string u);
+void putint(int c);
+
+int main(int argc, string args[])
+{
+    int i, s;
+    s = size(args);
+    puts("argc:");
+    putint( s );
+    
+    for (i = 0; i < s; ++i)
+        puts(args[i]);
+
+    return 0;
+}

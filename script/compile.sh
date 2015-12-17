@@ -47,8 +47,8 @@ if [ $# -ge 1 ]; then
     done
     if [[ ${#files} != "0" ]]; then
 	echo "assemble and link ..."
-	${CC} -o a.out ${files[@]} -L/net/i/tmijieux/public/lib/ -lgc \
-    	      -pthread -L$SDIR/libu -lu
+	${CC} -o a.out ${files[@]} -L/net/i/tmijieux/public/lib/\
+              -nostartfiles -lgc -pthread -L$SDIR/libu -lu
     	# assemble et link les .S
 	clean
     else
@@ -56,7 +56,6 @@ if [ $# -ge 1 ]; then
 	exit 1
     fi
     exit 0
-    
 else
     echo "no input files"
     exit 1

@@ -46,8 +46,8 @@ void symb_cg(struct symbol *sy)
 // cette fonction est RECURSIVE (dans le compilateur)
 // mais genere des boucles imbriqués (iteratives) dans le programme généré
 // pour allouer les tableaux à dimensions multiples
-static const struct statement *st_array_alloc_rec(const struct expression
-						  *array, int depth)
+static const struct statement *
+st_array_alloc_rec(const struct expression *array, int depth)
 {
     struct symbol *fun_sy, *loop_counter_sy, *fun_arg_sy;
     const struct expression *assign_expr, *postfix;

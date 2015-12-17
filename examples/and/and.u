@@ -12,12 +12,12 @@ int true()
     return 1;	
 }
 
-int main()
+int main(int argc, string lol[])
 {
     string a;
-    a = "lel";
+    a = "lel\n";
     
-    if ( true()  && false() )
+    if ( false() || true() )
     {
         puts(a);
     }
