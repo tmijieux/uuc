@@ -6,9 +6,15 @@
 #include "type.h"
 #include "symbol_table.h"
 #include "scanner.h"
-
+#include "error.h"
+    
+#define BUFSIZE 1024
+    
 static void count(void);
 static int comment(void);
+static void line_marker(void);
+
+extern char* yyfilename;
 
 #include "grammar.tab.h"
 %}
@@ -18,6 +24,7 @@ L[a-zA-Z_]
 %option yylineno
 %%
 "/*"		{ comment(); }
+^"#"    	{ line_marker(); }
 "//".*          { count(); }
 "float"		{ count(); return(TOKEN_FLOAT); }
 "if"		{ count(); return(TOKEN_IF); }
@@ -116,3 +123,22 @@ static void count(void)
     old_yytext[old_yytext_index] = strstrip(yytext);
     // circular buffer for saving last tokens the parser went through
 }
+
+static void line_marker(void)
+{
+    char line[BUFSIZE];
+    char c;
+    char *filename;
+    
+    int i = 0;
+    while ((c = input()) != '\n' && c != 0 && i < BUFSIZE) {
+        line[i++] = c;
+    }
+    line[i] = 0;
+    sscanf(line, "%d \"%ms", &yylineno, &filename);
+    yyfilename = strstrip2(filename);
+    free(filename);
+    
+//    debug("line_marker %d, %s\n", yylineno, yyfilename);
+}
+

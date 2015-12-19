@@ -289,8 +289,8 @@ declarator
 
 // %type ( funtion_declarator )  = < struct symbol * >
 function_declarator
-: declarator '(' parameter_list ')'{ $$ = function_declare($1, $3); }
-| declarator '(' ')' { $$ = function_declare($1, list_new(0)); }
+: declarator '(' parameter_list ')'{ $$ = function_declare($1, $3, m); }
+| declarator '(' ')' { $$ = function_declare($1, list_new(0), m); }
 ;
 
 // %type ( declarator_list ) = < struct list * < struct symbol *>  >

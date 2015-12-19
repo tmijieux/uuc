@@ -35,5 +35,5 @@ uses any array
 
 >desactivate it by setting the NOGC environement variable to some value and
 rebuild it. (this desactivate for compilation only, it's still needed in target language)
->**NOGC="set" make -B**
+>**NOGC="anythingButEmptyString" make -B**
 
