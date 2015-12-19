@@ -5,6 +5,9 @@ COMPILE=../../compile
 # The purpose of this script is to verify if the compiler reports an error
 # only when it is supposed to do so
 #
+# What this script does NOT do:
+#  - check if programs compiling correctly have the correct execution behaviour
+#
 
 green()
 {
