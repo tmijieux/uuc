@@ -4,15 +4,25 @@
 
 void putint(int x)
 {
-    printf("%d\n", x);
+    printf("%d", x);
 }
 
 void putfloat(float x)
 {
-	printf("%f\n", x);
+	printf("%f", x);
 }
 
 void putaddr(struct uuarray*a)
 {
-	printf("%p\n", a);
+	printf("%p", a);
+}
+
+void putstr(char *str)
+{
+    fputs(str, stdout);
+}
+
+void putendl(void)
+{
+    printf("\n");
 }

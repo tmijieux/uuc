@@ -1,4 +1,5 @@
 void putint(int i);
+void putendl();
 
 int square(int x)
 {
@@ -20,7 +21,7 @@ int main()
 	}
 	x = reduce(add, map(square, A));
 	
-	putint(x);
+	putint(x);   putendl();
 	/*
 	  python:
 	  l=range(0, 1000)

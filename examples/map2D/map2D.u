@@ -1,12 +1,12 @@
 
 void putint(int i);
+void putendl();
 void putaddr(int x[]);
-
 
 int lol(int x[2])
 {
-	putint(x[0]);
-	putint(x[1]);
+	putint(x[0]); putendl();
+	putint(x[1]); putendl();
 	return 0;
 }
 

@@ -3,7 +3,7 @@ int z (float z, int k);
 
 int zz[][];
 
-int main(int x)
+void main()
 {
     int b, a;
     z;

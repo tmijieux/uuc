@@ -1,8 +1,10 @@
 void putint(int i);
+void putendl();
 
 void main()
 {
 	int tab[10];
 
 	putint((int)size(tab));
+	putendl();
 }

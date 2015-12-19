@@ -1,10 +1,12 @@
 int putint(int i);
 void putchar(int i);
+void putendl();
 
 int glob;
 
 int counter(int i)
 {
+	i;
 	return glob++;
 }
 
@@ -15,9 +17,9 @@ int main()
 	
 	a = map(counter, a); 
 	
-	for (i = 0; i < 10; ++i)
-		putint(a[i]);
-
+	for (i = 0; i < 10; ++i) {
+		putint(a[i]);  putendl();
+	}
 	/*
 	  with  map_linear extension:
 	  0

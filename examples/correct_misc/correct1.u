@@ -1,7 +1,8 @@
 
 void putint(int c);
+void putendl();
 
-int main(int argc, string argv[])
+int main()
 {
 	int A[25], B[25];
 	int i,x;
@@ -15,10 +16,10 @@ int main(int argc, string argv[])
 			B[i] = 1;
 			x = 0;
 		}
-		putint(B[i]);
+		putint(B[i]); putendl();
 		B[i] = i - 4;
 		A[i] = B[i];
-		putint(A[i]);
+		putint(A[i]); putendl();
 	}
 	return x;
 }

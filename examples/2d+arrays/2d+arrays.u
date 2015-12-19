@@ -1,6 +1,8 @@
 
 void putint(int c);
 int putchar(int a);
+void putstr(string s);
+int putendl();
 
 int main()
 {
@@ -21,30 +23,23 @@ int main()
 	{
 		for (i = 0; i < 4; ++i)
 		{
-			putint(a[i][j]);
+                    putint(a[i][j]); putstr(" ");
 		}
-		putchar(10);
+                putendl();
 	}
 	
-	
-	putchar(45);	
-	putchar(45);	
-	putchar(45);	
-	putchar(45);	
-	putchar(45);	
-	putchar(45);	
-	putchar(45);	
-	putchar(45);	
-	putchar(10);
-	putchar(10);	
+
+        putendl();
+        putstr("-----------");
+        putendl(); putendl();
 
 	for (i = 0; i < 4; ++i)
 	{
 		for (j = 0; j < 3; ++j)
 		{
-			putint(a[i][j]);
+			putint(a[i][j]);  putstr(" ");
 		}
-		putchar(10);
+                putendl();
 	}
 	
 	return 0;

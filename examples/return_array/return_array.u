@@ -1,4 +1,5 @@
 void putint(int i);
+void putendl();
 
 int creer_tableau[]()
 {
@@ -21,6 +22,6 @@ void main()
 		tableau[i] = i;
 
 	s = reduce(add, tableau);
-	putint(s);
+	putint(s); putendl();
 }
 

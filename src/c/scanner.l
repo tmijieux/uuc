@@ -135,9 +135,15 @@ static void line_marker(void)
         line[i++] = c;
     }
     line[i] = 0;
+
     sscanf(line, "%d \"%ms", &yylineno, &filename);
-    yyfilename = strstrip2(filename);
-    free(filename);
+    if (NULL != filename) {
+        yyfilename = strstrip2(filename);
+        free(filename);
+    } else {
+        fatal_error("cannot compile file with unprocessed preprocessor directives\n");
+    }
+    
     
 //    debug("line_marker %d, %s\n", yylineno, yyfilename);
 }

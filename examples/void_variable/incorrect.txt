@@ -4,3 +4,7 @@ ce programme ne compile pas
 
 void ne peut désigner seulement le type de retour pour les procédures 
 qui  ne renvoit rien
+
+
+on peut remarquer l'erreur un peu contradictoire au niveau de la vérification
+des paramètre  passé a void

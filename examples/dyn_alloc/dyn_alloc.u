@@ -1,6 +1,7 @@
 
 int putint(int i);
 void putchar(int i);
+void putendl();
 
 int tableau[](int n)
 {
@@ -9,12 +10,12 @@ int tableau[](int n)
 	return tab;
 }
 
-
 int global;
 
 int lol(int x)
 {
-	putint(global++);
+	x;
+	putint(global++); putendl();
 	return 0;
 }
 
@@ -27,7 +28,7 @@ void main()
 	for(i = 0; i < 10; ++i)
 	{
 		x[i] = 3*i;
-		putint(-x[i]);
+		putint(-x[i]); putendl();
 	}
 
 	map(lol, x);

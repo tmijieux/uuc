@@ -1,11 +1,11 @@
-
+void putendl();
 void putint(int c);
 
 int main()
 {
 	int s;
 	int x[10];
-	// line 5
+	// line 5 
 	x[4] = 3;
 		
 	s =  ++ x[4]; // OK
@@ -15,8 +15,8 @@ int main()
 	s = x[4] ++; // OK too: post incrementation is also ok
 
 
-	putint(s);    // --> 4
-	putint(x[4]); // --> 5
+	putint(s);    /* --> 4 */ putendl();
+	putint(x[4]); /* --> 5 */ putendl();
 
 	return 0;
 }

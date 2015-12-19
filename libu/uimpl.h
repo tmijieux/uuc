@@ -32,5 +32,7 @@ enum map_call_type {
 void putint(int x);
 void putfloat(float x);
 void putaddr(struct uuarray*);
+void putstr(char *str);
+void putendl(void);
 
 #endif //UIMPL_H

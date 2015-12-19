@@ -4,7 +4,7 @@ int foo2(float x);
 
 int bar(int z, int z);
     
-int main(int x, int y)
+int main()
 {
     float f, a[];
     

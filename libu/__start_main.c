@@ -24,7 +24,7 @@ int __start_main(int argc, char **argv, char **envp)
 
     
     uuenvp = GC_MALLOC((sizeof*envp) * (env_size+2));
-    memcpy(uuenvp, &envp[0], (sizeof*argv) * (env_size+1));
+    memcpy(uuenvp, &envp[-1], (sizeof*argv) * (env_size+2));
     uuenvp->size = (uint64_t) env_size;
     
     return main(argc, uuargv, uuenvp);

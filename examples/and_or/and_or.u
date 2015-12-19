@@ -1,0 +1,45 @@
+int puts(string s);
+
+int false()
+{
+    puts("appel de false");
+    return 0;
+}
+
+int true()
+{
+    puts("appel de true");
+    return 1;	
+}
+
+void main()
+{
+    string msg;
+    
+    if ( 4. && 0 )
+    {
+        puts("ne s'affiche pas");
+    }
+
+    /*
+	pas d'évaluation paresseuse.
+    */
+
+    if ( false() && true() )
+    {
+        puts("ne s'affiche pas");
+    }
+
+        
+    /*
+	pas d'évaluation paresseuse.
+    */
+    msg = "s'affiche";
+    if ( false() || true() )
+    {
+        puts(msg);
+    }
+
+
+    
+}
