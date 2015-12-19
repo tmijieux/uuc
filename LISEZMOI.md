@@ -9,7 +9,7 @@ ou pour avoir juste la sortie en llvm:
 avant la moulinette optimisation/assemblage/linkage
       ./uuc fichier  (1 seul fichier)
 
-# Problèmes eventuel:
+# Problèmes éventuels:
 ## pas de garbage collector (libgc):
 
 il est dispo ici: (http://www.hboehm.info/gc/).
