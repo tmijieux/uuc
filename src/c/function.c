@@ -128,7 +128,8 @@ void fun_cg(struct function *fun)
 }
 
 struct symbol *
-function_declare(struct symbol *declarator, struct list *param_list)
+function_declare(struct symbol *declarator, struct list *param_list,
+                 struct module *m)
 {
     declarator->type = type_new_function_type(declarator->type, param_list);
     st_set_parameters(param_list);

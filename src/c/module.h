@@ -1,8 +1,10 @@
 #ifndef MODULE_H
 #define MODULE_H
 
-#include "function.h"
 #include "symbol.h"
+
+struct module;
+struct function;
 
 extern struct module *m;
 

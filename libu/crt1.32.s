@@ -1,4 +1,4 @@
-.globl _start
+	.globl _start
 _start:
 	xor    %ebp,%ebp
 	pop    %esi
@@ -11,6 +11,6 @@ _start:
 	push   $__libc_csu_init
 	push   %ecx
 	push   %esi
-	push   $__start_main
+	push   $__start.main
 	call   __libc_start_main
 	hlt

@@ -10,3 +10,4 @@ a.out
 grammar.c
 grammar.tab.h
 scanner.c
+libu/__start_main.s

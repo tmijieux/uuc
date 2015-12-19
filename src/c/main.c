@@ -16,8 +16,8 @@ char *yyfilename = NULL;
 int main(int argc, char *argv[])
 {
     FILE *input = NULL;
-    m = module_new("module0");
     st_init();
+    m = module_new("module0");
 
     if (argc == 2) {
 	input = fopen(argv[1], "r");

@@ -26,5 +26,6 @@ NB: le gc est nécessaire dans le langage des que l'on utilise des tableaux
 
 pour le compilateur par contre, ce n'est pas obligatoire:
 on peut le désactiver dans le compilateur sans trop de soucis:
->** NOGC="pas_la_chaine_vide" make -B **
+>** NOGC="pasLaChaineVide" make -B **
+
 
