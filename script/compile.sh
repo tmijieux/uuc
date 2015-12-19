@@ -23,6 +23,12 @@ clean_die()
     exit 1
 }
 
+if [ ! -f $SDIR/uuc ]; then
+	echo "compilateur uuc introuvable"
+	echo "as tu fait make?"
+	exit 1
+fi
+
 if [ $# -ge 1 ]; then
     for i in $@; do
 	a=$(mktemp)
