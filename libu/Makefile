@@ -8,6 +8,11 @@ libu.a: $(OBJ)
 	$(RM) $@
 	ar cr $@ $^
 
+__start_main.o:
+	$(CC) -Wall -S __start_main.c -o __start_main.s 
+	sed -i 's/__start_main/__start\.main/g' __start_main.s
+	$(CC) -c __start_main.s -o $@
+
 libu.so: $(OBJ)
 	$(CC) -o $@ -fPIC -shared -pthread $^
 

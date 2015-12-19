@@ -1,7 +1,7 @@
 
 void putint(int c);
 
-int main(int argc, float argv[])
+int main(int argc, string argv[])
 {
 	int A[25], B[25];
 	int i,x;
