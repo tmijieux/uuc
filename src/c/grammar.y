@@ -17,9 +17,9 @@
 #include "codegen.h"
 #include "module.h"
     
-    extern int yylex();
-    struct list *declarator_list_append(struct list *l, struct symbol *s);
-    %}
+extern int yylex();
+struct list *declarator_list_append(struct list *l, struct symbol *s);
+%}
 
 %token <str> TOKEN_IDENTIFIER TOKEN_STRING_LITERAL
 %token <i> TOKEN_CONSTANTI
@@ -344,14 +344,14 @@ right_brace
 compound_statement
 : left_brace right_brace  {
     warning("Empty block is useless\n");
-    $$ = stmt_compound(NULL, NULL);
+    $$ = stmt_compound(list_new(0), list_new(0));
  }
 | left_brace statement_list right_brace {
-    $$ = stmt_compound(NULL, $2);
+    $$ = stmt_compound(list_new(0), $2);
  }
 | left_brace declaration_list right_brace {
     warning("Block with no instructions\n");
-    $$ = stmt_compound(NULL, NULL); // discard the useless declaration!
+    $$ = stmt_compound($2, list_new(0)); 
  }
 | left_brace declaration_list statement_list right_brace
 { $$ = stmt_compound($2, $3); }

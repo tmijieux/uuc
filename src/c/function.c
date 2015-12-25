@@ -41,7 +41,7 @@ int fun_set_body(struct function *fun, const struct statement *compnd)
     if (NULL != compnd->stmt_list) {
 	int si = list_size(compnd->stmt_list);
 	struct statement *st = list_get(compnd->stmt_list, si);
-	if (st->statement_type != STMT_JUMP) {
+	if (0 == si || st->statement_type != STMT_JUMP) {
 	    if (type_function_return(fun->name_s->type) == type_void) {
 		// add an implicit return void at end of
 		// void function :

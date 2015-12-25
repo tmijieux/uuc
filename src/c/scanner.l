@@ -101,10 +101,8 @@ int yycolno = 0;
 
 unsigned int old_yytext_index = 0;
 const char *old_yytext[YYOLDTEXT_SIZE] = {
-    "", "", "", "", "", "", "", "", "", "",
-    "", "", "", "", ""
+    "", "", "", "", "", "", "", "", "", "", "", "", "", "", ""
 };
-
 
 /* This function counts the number of character, for debugging purposes */
 static void count(void)
@@ -128,7 +126,7 @@ static void line_marker(void)
 {
     char line[BUFSIZE];
     char c;
-    char *filename;
+    char *filename = NULL;
     
     int i = 0;
     while ((c = input()) != '\n' && c != 0 && i < BUFSIZE) {
