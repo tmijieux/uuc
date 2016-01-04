@@ -115,25 +115,31 @@ const struct expression *expr_map(const struct expression *fun,
     expr->fun = fun;
     expr->array = array;
 
-    int trigger_error =
+    bool trigger_error =
 	(fun->type != type_generic && array->type != type_generic);
 
-    if (trigger_error && !type_is_function(fun->type)) {
-	error("first operand to map operator" " must be a function.\n");
-    } else {
-	if (trigger_error && type_function_argc(fun->type) != 1) {
-	    if (trigger_error)
-		error("map first operand should"
-		      " take exactly one parameter.\n");
-	} else if (trigger_error) {
+    if (trigger_error) {
+        bool have_error = false;
+        if (!type_is_function(fun->type)) {
+            error("first operand to map operator" " must be a function.\n");
+            have_error = true;
+        } else {
+            if (type_function_return(fun->type) == type_void) {
+                error("map function must not return void\n");
+                have_error = true;
+            }
+            if (type_function_argc(fun->type) != 1) {
+                error("map first operand should take exactly one parameter.\n");
+                have_error = true;
+            }
+        }
+        if (!have_error)
 	    valid_op_F = true;
-	}
-    }
 
-    if (trigger_error && !type_is_array(array->type)) {
-	error("second operand to map operator" " must be an array.\n");
-    } else if (trigger_error) {
-	valid_op_A = true;
+        if (!type_is_array(array->type))
+            error("second operand to map operator" " must be an array.\n");
+        else
+            valid_op_A = true;
     }
 
     if (valid_op_F && valid_op_A) {
