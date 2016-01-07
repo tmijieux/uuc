@@ -66,6 +66,12 @@ test_incorrect_exo()
     done
 }
 
+cd $(dirname $0)
+if [ ! -f ../uuc ]; then
+	echo "Erreur compilateur introuvable; Pensez à faire \"make\" (à la racine)"
+	exit 1
+fi
+
 for i in *; do
     if [ -d $i  ]; then
 	pushd $i > /dev/null

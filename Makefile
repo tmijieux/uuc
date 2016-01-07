@@ -7,6 +7,9 @@ uuc: libu/libu.a
 	make -C src/c/
 	ln -s src/c/uuc ./uuc -f
 
+test: uuc
+	./examples/test.sh
+
 libu/libu.a:
 	MAP=linear make -C libu/
 
