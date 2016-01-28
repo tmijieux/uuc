@@ -1,0 +1,18 @@
+void putint(int u);
+void putendl();
+
+int main()
+{
+	int a, b, c;
+
+	a = -3;
+	c = 7;
+	a = b = c;
+	putint(a); /* --> 7*/ putendl();
+	
+	b = a = 3;
+	putint(a); /*--> 3 */ putendl();
+	putint(b); /*--> 3 */ putendl();
+
+	return 0;
+}

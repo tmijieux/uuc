@@ -1,0 +1,5 @@
+void_variable.u: 1:19: [91merror[0m: [96mvoid is not a valid type.
+[0mvoid_variable.u: 5:11: [91merror[0m: [96mvoid is not a valid type for a variable.
+[0mvoid_variable.u: 7:19: [91merror[0m: [96mfoobar(): argument 1 has invalid type.
+expected [92mvoid[0m [96mbut[0m [93mint[0m [96mwas given.[0m
+[0m

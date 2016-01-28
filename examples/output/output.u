@@ -1,0 +1,10 @@
+#include "../../libu/ubio.h"
+
+void main()
+{ 
+    int a;
+
+    a = 10;
+    putstr("Je suis un programme et j'ai une variable a qui vaut ");
+    putint(a); putendl();
+}

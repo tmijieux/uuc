@@ -1,3 +1,18 @@
+# various:
+uuc
+*~
+*.pdf
+*.aux
+*.log
+a.out
+*.a
+*.so
+*.o
+grammar.c
+grammar.tab.h
+scanner.c
+libu/__start_main.s
+
 # Object files
 *.o
 *.ko
@@ -30,3 +45,5 @@
 
 # Debug files
 *.dSYM/
+
+

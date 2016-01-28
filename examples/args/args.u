@@ -1,0 +1,16 @@
+void putint(int c);
+void putendl();
+int puts(string s);
+
+int main(int argc, string argv[])
+{
+    int i;
+    putint(argc); putendl();
+    for (i = 0; i < argc; i++)
+    {
+        puts(argv[i]);
+    }
+
+    return 0;
+}
+    

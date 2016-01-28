@@ -1,0 +1,13 @@
+warnings.u: 7:1: [93mwarning[0m: [96munused variable foo
+[0mwarnings.u: 7:1: [93mwarning[0m: [96mBlock with no instructions
+[0mwarnings.u: 12:1: [93mwarning[0m: [96mEmpty block is useless
+[0mwarnings.u: 16:18: [93mwarning[0m: [96mreturn statement makes an implicit cast
+[0mwarnings.u: 19:12: [93mwarning[0m: [96m
+main definition should follow one of the following prototype:
+void/int main();
+void/int main(int argc, string argv[]);
+void/int main(int argc, string argv[], string envp[]);
+[0mwarnings.u: 23:15: [93mwarning[0m: [96massignment makes an implicit cast
+[0mwarnings.u: 25:14: [93mwarning[0m: [96massignment makes an implicit cast
+[0mwarnings.u: 27:17: [93mwarning[0m: [96mreturn statement makes an implicit cast
+[0m

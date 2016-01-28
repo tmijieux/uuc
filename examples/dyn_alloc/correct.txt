@@ -1,0 +1,7 @@
+ce programme compile
+
+---
+
+ce programme fonctionne
+si le map est en mode Thread, le sortie peut être legerement 
+chamboulé dans le map

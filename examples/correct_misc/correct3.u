@@ -1,0 +1,24 @@
+
+void putint(int c);
+void putendl();
+
+int main()
+{
+	int i, x;
+	int A[1000], B[1000];
+
+	x=0;
+	for (i=0; i<1000; i++) {
+		B[i] = i - 3;
+		A[i] = B[i];
+	}
+	for (i=0; i<1000; i++) {
+		x+=A[i]*A[i];
+	}
+	putint(x); putendl();
+	/*
+	python: sum(map(lambda x: x**2, range(-3, 2000-3))) --> 329845500
+	*/
+
+	return x;
+}

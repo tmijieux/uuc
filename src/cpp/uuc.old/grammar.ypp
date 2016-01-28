@@ -1,0 +1,528 @@
+%{
+#ifndef _GNU_SOURCE	
+#define _GNU_SOURCE
+#endif
+#include <stdio.h>
+#include <stdlib.h>
+
+#include "type.hpp"
+#include "list.hpp"
+#include "symbol.hpp"
+#include "symbol_table.hpp"
+#include "error.hpp"
+#include "function.hpp"
+#include "expression.hpp"
+#include "statement.hpp"
+#include "program.hpp"
+#include "llvm.hpp"
+	
+    extern int yylex();
+    static int yyerror(const char *);
+
+    %}
+
+%token <str> TOKEN_IDENTIFIER
+%token <i> TOKEN_CONSTANTI
+%token <f> TOKEN_CONSTANTF
+%token TOKEN_MAP TOKEN_REDUCE TOKEN_EXTERN
+%token TOKEN_INC_OP TOKEN_DEC_OP TOKEN_LE_OP TOKEN_GE_OP TOKEN_EQ_OP TOKEN_NE_OP
+%token TOKEN_SUB_ASSIGN TOKEN_MUL_ASSIGN TOKEN_ADD_ASSIGN
+%token TOKEN_INT TOKEN_FLOAT TOKEN_VOID
+%token TOKEN_IF TOKEN_ELSE TOKEN_WHILE TOKEN_RETURN TOKEN_FOR TOKEN_DO
+
+%type <enum_type> type_name
+
+%type <symbol> declarator parameter_declaration function_declarator prototype
+%type <func> function_definition
+
+%type <list> declarator_list declaration_list parameter_list declaration
+%type <list> argument_expression_list statement_list program
+
+%type <expr> expression unary_expression comparison_expression primary_expression
+%type <expr> postfix_expression multiplicative_expression additive_expression
+
+%type <stmt> statement expression_statement compound_statement 
+%type <stmt> selection_statement iteration_statement jump_statement
+
+%type <c> assignment_operator
+%type <str> external_declaration
+
+%start program
+%union {
+    // scalars:
+    char *str;
+    char c;
+    int i;
+    float f;
+
+    // utilities
+    struct list *list;
+    struct expression *expr;
+    struct function *func;
+    struct statement *stmt;
+    struct symbol *symbol;
+    enum enum_type enum_type;
+};
+%%
+ /***************** EXPRESSION ******************/
+
+ // expression > comparison > additive >
+ //	multiplicative > unary > postfix > primary
+
+expression				   
+: unary_expression assignment_operator expression {
+    struct expression *e = NULL;
+    switch ($2) {
+    case '=':
+	$$ = expr_new(EXPR_ASSIGNMENT, $1, $3);
+	break;
+    case '-':
+	e = expr_new(EXPR_SUBSTRACTION, $1, $3);
+	$$ = expr_new(EXPR_ASSIGNMENT, $1, e);
+	break;
+    case '+':
+	e = expr_new(EXPR_ADDITION, $1, $3);
+	$$ = expr_new(EXPR_ASSIGNMENT, $1, e);
+	break;
+    case '*':
+	e = expr_new(EXPR_MULTIPLICATION, $1, $3);
+	$$ = expr_new(EXPR_ASSIGNMENT, $1, e);
+	break;
+	
+    default:
+	fatal_error("default clause reached, assignment operator");
+	break;
+    }
+ }
+| comparison_expression { $$ = $1; }
+;
+
+argument_expression_list
+: expression	{ $$ = list_new(0); list_append($$, $1); }
+| argument_expression_list ',' expression { list_append($1, $3); }
+;
+
+assignment_operator
+: '='				{ $$ = '='; }
+| TOKEN_MUL_ASSIGN   { $$ = '*'; }
+| TOKEN_ADD_ASSIGN   { $$ = '+'; }
+| TOKEN_SUB_ASSIGN   { $$ = '-'; }
+;
+
+primary_expression
+: TOKEN_IDENTIFIER  {
+    struct symbol *sy = symbol_check($1);
+    $$ = expr_new(EXPR_SYMBOL, sy);
+ }
+| TOKEN_CONSTANTI { $$ = expr_new(EXPR_CONSTANT, type_int, $1); }
+| TOKEN_CONSTANTF { $$ = expr_new(EXPR_CONSTANT, type_float,  $1); }
+| '(' expression ')' { $$ = $2; }
+| TOKEN_MAP '(' postfix_expression ',' postfix_expression ')' {
+    $$ = expr_new(EXPR_MAP, $3, $5);
+  }
+| TOKEN_REDUCE '(' postfix_expression ',' postfix_expression ')' {
+    $$ = expr_new(EXPR_REDUCE, $3, $5);
+  }
+| TOKEN_IDENTIFIER '(' ')'  {						  // funcall
+    struct symbol *sy =  symbol_check($1);
+    $$ = expr_new(EXPR_FUNCALL, sy);
+  }
+| TOKEN_IDENTIFIER '(' argument_expression_list ')' { // funcall with parameter
+    struct symbol *sy = symbol_check($1);
+    $$ = expr_new(EXPR_FUNCALL_PARAMS, $3, sy);
+  }
+;
+
+postfix_expression
+: primary_expression					{ $$ = $1; }
+| postfix_expression '[' expression ']' { $$ = expr_new(EXPR_POSTFIX, $1, $3); }
+;
+
+unary_expression
+: postfix_expression				 { $$ = $1; }
+| TOKEN_INC_OP postfix_expression	{ $$ = expr_new(EXPR_PRE_INC, $2); }
+| TOKEN_DEC_OP postfix_expression	{ $$ = expr_new(EXPR_PRE_DEC, $2); }
+| postfix_expression TOKEN_INC_OP	{ $$ = expr_new(EXPR_POST_INC, $1); } 
+| postfix_expression TOKEN_DEC_OP	{ $$ = expr_new(EXPR_POST_DEC, $1); }
+| '-'  unary_expression			  { $$ = expr_new(EXPR_UNARY_MINUS, $2); }
+;
+
+multiplicative_expression
+: unary_expression			   { $$ = $1; }
+| multiplicative_expression '*' unary_expression  {
+    $$ = expr_new(EXPR_MULTIPLICATION, $1, $3);
+  }
+| multiplicative_expression '/' unary_expression {
+    $$ = expr_new(EXPR_DIVISION, $1, $3);
+  }
+;
+
+additive_expression
+: multiplicative_expression			 { $$ = $1; }
+| additive_expression '+' multiplicative_expression {
+    $$ = expr_new(EXPR_ADDITION, $1, $3);
+  }
+| additive_expression '-' multiplicative_expression {
+    $$ = expr_new(EXPR_SUBSTRACTION, $1, $3);
+  }
+;
+
+comparison_expression
+: additive_expression			  { $$ = $1; }
+| additive_expression '<' additive_expression {
+    $$ = expr_new(EXPR_LOWER, $1, $3);
+  }
+| additive_expression '>' additive_expression {
+    $$ = expr_new(EXPR_GREATER, $1, $3);
+  }
+| additive_expression TOKEN_LE_OP additive_expression {
+    $$ = expr_new(EXPR_LEQ, $1, $3);
+ }
+| additive_expression TOKEN_GE_OP additive_expression {
+    $$ = expr_new(EXPR_GEQ, $1, $3);
+ }
+| additive_expression TOKEN_EQ_OP additive_expression {
+    $$ = expr_new(EXPR_EQ, $1, $3);
+ }
+| additive_expression TOKEN_NE_OP additive_expression {
+    $$ = expr_new(EXPR_NEQ, $1, $3);
+ }
+;
+
+// ************ DECLARATIONS *****************/
+
+// % type ( program ) = < list < char *  > >
+program
+: external_declaration {
+    if ($1 != NULL)
+	list_append(fun_code, $1);
+ }
+| program external_declaration {
+    if ($2 != NULL)
+	list_append(fun_code, $2);
+ }
+;
+
+// % type  ( external_declaration ) = < char * >
+external_declaration
+: function_definition {
+    $$ = (char*) $1->code;
+ }
+| declaration {
+#ifdef PRINT_INFO
+    printf("GLOBAL DECLARATION(S): \n");
+    for (unsigned int i = 1; i <= list_size($1); ++i)
+    {
+	struct symbol *sy = (struct symbol*) list_get($1, i);
+	symbol_print(sy);
+    }
+    printf("\n");
+#endif
+	
+    $$ = NULL;
+  }
+| prototype { // %type < prototype > = < struct * symbol >
+    asprintf(&$$,
+	     "declare %s @%s(%s)",
+	     llvm_type($1->type->function_type.return_value),
+	     $1->name,
+	     llvm_arglist($1->type->function_type.args));
+  }
+;
+
+function_definition
+: type_name function_declarator compound_statement {
+	 
+    if (fun_defined($2))
+    {
+	fatal_error("multiple definition for function %s\n", $2->name);
+    }
+    else
+    {
+	fun_define($2);
+	// TODO add code taken from compound_statement as 2nd argument
+	// the function may(/should?) 'export the symbol of the function'
+
+#ifdef PRINT_INFO
+	printf("FUNCTION DEFINITION\n");
+	symbol_print($2);
+	printf("\n");
+#endif
+	char *code;
+	asprintf( &code, "%s\n%s",
+		  decl_concat_list( $2->type->function_type.args ),
+		  $3->code );
+	$$ = fun_new($2, code);
+    }
+ }
+;
+
+prototype
+: type_name function_declarator ';' {
+#ifdef PRINT_INFO
+    printf("PROTOTYPE\n");
+    symbol_print($2);
+#endif
+    $$ = $2;
+ }
+;
+
+// *** declaration
+type_name
+: TOKEN_VOID   { $$ = TYPE_VOID; last_type_name = type_void; }
+| TOKEN_INT	{ $$ = TYPE_INT;  last_type_name = type_int; }
+| TOKEN_FLOAT  { $$ = TYPE_FLOAT; last_type_name = type_float; }
+;
+
+// %type ( declaration ) = < struct list * < struct symbol *>  >
+declaration
+: type_name declarator_list ';' {
+    if ($1 == TYPE_VOID) 
+	error("void is not a valid type for a variable.\n");
+    $$ = $2;
+ }
+| TOKEN_EXTERN type_name declarator_list ';' {
+    if ($2 == TYPE_VOID) 
+	error("void is not a valid type for a variable.\n");
+    $$ = $3;
+ }
+;
+
+// %type ( declaration_list ) = < struct list * < struct symbol *>  >
+declaration_list
+: declaration  { $$ = $1; }
+| declaration_list declaration  { list_append_list($1, $2); $$ = $1; }
+;
+
+// *** declarator  (plusieurs declarator par declarations)
+// %type ( declarator ) = < struct symbol * >
+declarator
+: TOKEN_IDENTIFIER { $$ = symbol_new($1, last_type_name); }
+| '(' declarator ')' { $$ = $2; }
+| declarator '[' TOKEN_CONSTANTI ']' {
+    $$ = $1;
+    $$->type = type_new_array_type($1->type, $3);
+  }
+| declarator '[' ']' {
+    $$ = $1;
+    $$->type = type_new_array_type($1->type, 0);
+  }
+;
+
+// %type ( funtion_declarator )  = < struct symbol * >
+function_declarator
+: declarator '(' parameter_list ')'  {
+    $$ = $1;
+    $$->type = type_new_function_type($1->type, $3);
+    st_set_parameters($3);
+    $$->symbol_type = SYM_FUNCTION;
+	
+    struct symbol *tmpsy;
+    if ( !st_search($1->name, &tmpsy) )
+    {
+	// first declaration : add to the table
+	st_add($1);
+    }
+    else
+    {
+	// TODO : check that the types match the previous declaration
+    }
+ }
+| declarator '(' ')' {
+    $$ = $1;
+    struct list *l = list_new(0);
+    $$->type = type_new_function_type($1->type, l);
+    st_set_parameters(NULL);
+    struct symbol *tmpsy;
+    if ( !st_search($1->name, &tmpsy) )
+    {
+	st_add($1);
+    }
+    else
+    {
+	// TODO: check prototype
+	// TODO: factorize with declarator with parameters
+    }
+  }
+;
+
+// %type ( declarator_list ) = < struct list * < struct symbol *>  >
+declarator_list
+: declarator					 {
+    $$ = list_new(0);
+    list_append($$, $1);
+    if ( !st_add($1) )
+	error("symbol multiple definition : %s \n", $1->name);
+ }
+| declarator_list ',' declarator {
+    $$ = $1;
+    list_append($$, $3);
+    if ( !st_add($3) )
+	error("symbol multiple definition : %s \n", $3->name);
+    // TODO factorize those two rules 
+  }
+;
+
+// *** PARAMETER DECL
+
+// % type ( parameter_declaration ) = < struct symbol * >
+parameter_declaration
+: type_name declarator {
+    if ($1 == TYPE_VOID) 
+	error("void is not a valid type.\n");
+    $$ = $2;
+    $$->symbol_type = SYM_VARIABLE;
+    $$->variable.is_parameter = 1;
+ }
+;
+
+// % type ( parameter_list ) = < struct list * < struct symbol * > >
+parameter_list
+: parameter_declaration {
+    $$ = list_new(0); list_append($$, $1);
+ }
+| parameter_list ',' parameter_declaration {
+    $$ = $1; list_append($$, $3);
+  }
+;
+
+/************* STATEMENTS  **************/
+statement
+: compound_statement	{ $$ = $1; }
+| expression_statement  { $$ = $1; }
+| selection_statement   { $$ = $1; }
+| iteration_statement   { $$ = $1; }
+| jump_statement		{ $$ = $1; }
+;
+
+statement_list
+: statement  { $$ = list_new(0); list_append($$, $1);  }
+| statement_list statement { list_append($1, $2); }
+;
+
+compound_statement
+: '{' '}'  {
+    warning("Empty block is useless\n");
+    $$ = stmt_new();
+    $$->code = "";
+ }
+| '{' statement_list '}' {
+    $$ = stmt_new();
+    $$->code = stmt_concat_list($2);
+  }
+| '{' declaration_list '}' {
+    warning("Block with no instructions\n");
+    $$ = stmt_new();
+    $$->code = "";
+  }
+| '{' declaration_list statement_list '}' {
+    char *code;
+    asprintf(&code,
+	     "%s\n%s",
+	     decl_concat_list($2),
+	     stmt_concat_list($3));
+    $$ = stmt_new();
+    $$->code = code;
+  }
+;
+
+expression_statement
+: ';'  {
+    $$ = stmt_new();
+    $$->expr = NULL;
+    $$->code = "";
+ }
+| expression ';' {
+    $$ = stmt_new();
+    $$->code = $1->rvalue_code;
+    $$->expr = $1;
+  }
+;
+
+selection_statement
+: TOKEN_IF '(' expression ')' statement {
+    $$ = stmt_new();
+    $$->code = stmt_code_if($3, $5);
+ }
+| TOKEN_IF '(' expression ')' statement TOKEN_ELSE statement {
+    $$ = stmt_new();
+    $$->code = stmt_code_if_else($3, $5, $7);
+  }
+| TOKEN_FOR '(' expression_statement expression_statement expression ')' statement
+{
+    $$ = stmt_new();
+    $$->code = stmt_code_for($3->expr, $4->expr, $5, $7);
+}
+;
+
+iteration_statement
+: TOKEN_WHILE '(' expression ')' statement {
+    $$ = stmt_new();
+    $$->code = stmt_code_while($3, $5);
+ }
+| TOKEN_DO statement TOKEN_WHILE '(' expression ')' ';' {
+    $$ = stmt_new();
+    $$->code = stmt_code_do_while($5, $2);
+ }
+;
+
+jump_statement
+: TOKEN_RETURN ';' {
+    $$ = stmt_new();
+    $$->code = stmt_code_return_void();
+ }
+| TOKEN_RETURN expression ';' {
+    $$ = stmt_new();
+    $$->code = stmt_code_return($2);
+ }
+;
+/************************************************/
+
+
+%%
+#include <stdio.h>
+#include <string.h>
+
+extern char *yytext;
+extern int yycolno;
+extern int yylineno;
+extern FILE *yyin;
+
+char *yyfilename = NULL;
+
+static int yyerror( const char *s )
+{
+    fflush (stdout);
+    fprintf (stderr, "%s:%d:%d: \e[91m%s\e[39m\n",
+	     yyfilename, yylineno, yycolno, s);
+    return 0;
+}
+
+int main(int argc, char *argv[])
+{
+    FILE *input = NULL;
+
+    fun_init();
+    st_init();
+	
+    if ( argc == 2 ) {
+	input = fopen( argv[1], "r" );
+	yyfilename = strdup(argv[1]);
+	if (input) {
+	    yyin = input;
+	} else {
+	    fprintf (stderr, "%s: Could not open %s\n", *argv, argv[1]);
+	    return EXIT_FAILURE;
+	}
+    } else {
+	fprintf (stderr, "%s: fatal error: no input file\n", *argv);
+	return EXIT_FAILURE;
+    }
+    yyparse();
+    fclose(input);
+	
+    prgm_print_code();
+    free(yyfilename);
+
+    return EXIT_SUCCESS;
+}

@@ -1,0 +1,2 @@
+tous les termes sont évalués: pas d'évaluations paresseuses.
+

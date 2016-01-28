@@ -1,0 +1,12 @@
+extern int a;
+int main()
+{
+    int a;
+    void lol() {
+        a++;
+    }
+    
+    a = 0;
+    lol();
+    return a;
+}
