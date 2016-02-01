@@ -11,6 +11,7 @@
 #include "program.h"
 #include "statement.h"
 #include "function.h"
+#include "util/alloc.h"
 
 static const struct statement *
 st_array_alloc_rec(const struct expression *array, int depth);
@@ -70,7 +71,7 @@ st_array_alloc_rec(const struct expression *array, int depth)
     list_append(l, fun_arg_sy);	// prototype for GC_malloc
     malloc_type = type_new_function_type(type_generic, l);
 
-    fun_sy = symbol_new("GC_malloc", malloc_type);
+    fun_sy = symbol_new(UUC_WHAT_MALLOC, malloc_type);
     fun_sy->symbol_type = SYM_FUNCTION;
     
     l = list_new(0);

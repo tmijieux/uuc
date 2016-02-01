@@ -4,6 +4,7 @@
 
 #include <stdio.h>
 #include <string.h>
+
 #include "module.h"
 #include "function.h"
 #include "symbol.h"
@@ -11,6 +12,7 @@
 #include "codegen.h"
 #include "string_literal.h"
 #include "error.h"
+#include "util/alloc.h"
 
 struct module {
     struct hash_table *funtable;
@@ -79,7 +81,7 @@ static int module_add_default_prototype(struct module *m)
     
     param = symbol_new("size", type_long);
     param->variable.is_parameter = true;
-    fun = function_declare(symbol_new("GC_malloc", type_generic),
+    fun = function_declare(symbol_new(UUC_WHAT_MALLOC, type_generic),
                            list_new(LI_ELEM, param, NULL), m);
     module_add_prototype(m, fun);
 

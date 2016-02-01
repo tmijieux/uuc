@@ -1,6 +1,7 @@
 MAP?=thread
 OBJ=reduce_linear.o bio.o map_$(MAP).o crt1.o __start_main.o
-CFLAGS=-Wall -std=gnu99 -fPIC -I ~tmijieux/public/include
+CFLAGS=-Wall -std=gnu99 -fPIC -I ~tmijieux/public/include -O3 -fopenmp -funroll-all-loops
+
 LDFLAGS=-L ~tmijieux/public/lib/ -lgc
 
 all: libu.a # libu.so

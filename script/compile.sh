@@ -54,7 +54,7 @@ if [ $# -ge 1 ]; then
     if [[ ${#files} != "0" ]]; then
 	echo "assemble and link ..."
 	${CC} -o a.out ${files[@]} -L/net/i/tmijieux/public/lib/\
-              -nostartfiles -lgc -pthread -L$SDIR/libu -lu
+              -nostartfiles -lgc -pthread -fopenmp -L$SDIR/libu -lu 
     	# assemble et link les .S
 	clean
     else

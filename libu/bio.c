@@ -9,12 +9,12 @@ void putint(int x)
 
 void putfloat(float x)
 {
-	printf("%f", x);
+    printf("%f", x);
 }
 
 void putaddr(struct uuarray*a)
 {
-	printf("%p", a);
+    printf("%p", a);
 }
 
 void putstr(char *str)
